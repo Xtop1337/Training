@@ -23,7 +23,6 @@
 
 import re
 import smtplib
-import sqlite3
 
 from flask import Flask, jsonify, redirect, request
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -223,7 +222,7 @@ def register():
 
     try:
         user_id = database.add_user(email, generate_password_hash(password))
-    except sqlite3.IntegrityError:
+    except database.INTEGRITY_ERRORS:
         return make_error("Эта почта уже зарегистрирована. Попробуй войти.", 409, "exists")
 
     if not send_confirm_mail(user_id, email):
@@ -404,14 +403,30 @@ def save_progress():
     return jsonify({"ok": True})
 
 
-def main():
+def prepare_database():
     """
-    Функция, которая готовит базу данных и запускает сервер.
+    Функция, которая создаёт таблицы (если их ещё нет) и удаляет просроченные записи.
+    Вызывается сразу при загрузке файла: на хостинге сервер запускает gunicorn,
+    и функция main() там не выполняется.
     """
     database.create_tables()
     database.delete_expired_rows()
-    if not config.SMTP_HOST:
-        print("Почта для писем не настроена: ссылки для подтверждения будут печататься здесь.")
+    if database.USE_POSTGRES:
+        print("База данных: Postgres (DATABASE_URL)")
+    else:
+        print("База данных: SQLite,", config.DATABASE_PATH)
+    if not config.BREVO_API_KEY and not config.SMTP_HOST:
+        print("Почта для писем не настроена: ссылки из писем будут печататься здесь.")
+
+
+prepare_database()
+
+
+def main():
+    """
+    Функция, которая запускает сервер у себя на компьютере.
+    На хостинге вместо неё работает команда: gunicorn app:app
+    """
     app.run(host=config.HOST, port=config.PORT, debug=config.DEBUG)
 
 

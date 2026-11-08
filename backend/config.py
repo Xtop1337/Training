@@ -18,7 +18,8 @@ def load_env_file(path):
     Функция, которая читает файл .env со строками вида КЛЮЧ=значение
     и кладёт их в переменные окружения (os.environ).
     Если файла нет, ничего не делает.
-    Переменные, уже заданные в системе, не перезаписываются.
+    Переменные, уже заданные в системе, не перезаписываются,
+    а пустые строки (КЛЮЧ=) пропускаются — тогда действует значение по умолчанию.
     """
     if not os.path.exists(path):
         return
@@ -29,11 +30,17 @@ def load_env_file(path):
             if not line or line.startswith("#") or "=" not in line:
                 continue
             name, value = line.split("=", 1)
-            os.environ.setdefault(name.strip(), value.strip())
+            if value.strip():
+                os.environ.setdefault(name.strip(), value.strip())
 
 
 load_env_file(os.path.join(BACKEND_DIR, ".env"))
 
+
+# База данных на хостинге — строка подключения к Postgres, например от Neon:
+# postgresql://user:password@host/dbname?sslmode=require
+# Если DATABASE_URL пустой, используется файл SQLite (удобно для запуска у себя).
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
 # Файл базы данных SQLite. Создаётся сам при первом запуске сервера.
 DATABASE_PATH = os.path.join(BACKEND_DIR, "training.db")
@@ -54,11 +61,17 @@ SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")
 
 # Сайты, которым разрешено обращаться к API (CORS).
 # Без этого браузер не даст странице с другого адреса читать ответы сервера.
+# На хостинге адрес сайта (например, на Vercel) добавляется через переменную
+# ALLOWED_ORIGINS — несколько адресов через запятую, без / в конце.
 ALLOWED_ORIGINS = [
     "https://xtop1337.github.io",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
+for origin in os.environ.get("ALLOWED_ORIGINS", "").split(","):
+    origin = origin.strip().rstrip("/")
+    if origin and origin not in ALLOWED_ORIGINS:
+        ALLOWED_ORIGINS.append(origin)
 
 # Сколько дней действует вход, прежде чем придётся войти снова
 SESSION_DAYS = 30
@@ -81,11 +94,19 @@ PASSWORD_MAX_LENGTH = 100
 PROGRESS_KEYS = ["limits-progress-v1", "deriv-progress-v1", "integrals-progress-v1"]
 PROGRESS_MAX_ITEMS = 1000
 
-# Почта, с которой уходят письма (SMTP).
-# Если SMTP_HOST пустой, письма не отправляются, а ссылка печатается в терминал —
-# так удобно проверять всё локально.
+# Как отправляются письма — по первому заданному способу:
+#   1) BREVO_API_KEY — через HTTP API сервиса Brevo (подходит для бесплатного Render,
+#      где SMTP-порты закрыты);
+#   2) SMTP_HOST — через обычный почтовый сервер (Яндекс, Mail.ru, Gmail);
+#   3) ничего не задано — письмо не отправляется, а ссылка печатается в терминал.
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
+
+# Имя отправителя, которое человек увидит в почте
+MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "Training")
+
 SMTP_HOST = os.environ.get("SMTP_HOST", "")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "465"))
 SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
-MAIL_FROM = os.environ.get("MAIL_FROM", SMTP_USER)
+# Адрес отправителя; если не задан, берётся логин SMTP
+MAIL_FROM = os.environ.get("MAIL_FROM") or SMTP_USER

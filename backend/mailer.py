@@ -1,12 +1,23 @@
 """
 Отправка писем: подтверждение почты и восстановление пароля.
-Настройки почтового ящика берутся из config.py (а туда — из backend/.env).
+Настройки берутся из config.py (а туда — из backend/.env или переменных окружения хостинга).
+
+Способы отправки (по порядку):
+    1) BREVO_API_KEY — через HTTP API Brevo. Нужен на бесплатном Render: там закрыты SMTP-порты;
+    2) SMTP_HOST — через обычный почтовый сервер;
+    3) ничего не задано — ссылка из письма печатается в терминал.
 """
 
+import json
 import smtplib
+import urllib.error
+import urllib.request
 from email.message import EmailMessage
 
 import config
+
+
+BREVO_URL = "https://api.brevo.com/v3/smtp/email"
 
 
 def make_message(email, subject, intro, button_text, link, footer):
@@ -34,20 +45,41 @@ def make_message(email, subject, intro, button_text, link, footer):
     return message
 
 
-def send_message(message, link):
+def send_with_brevo(message):
     """
-    Функция, которая отправляет готовое письмо через SMTP.
-    Если почта для отправки не настроена (SMTP_HOST пустой),
-    письмо не отправляется, а ссылка печатается в терминал — так удобно проверять локально.
+    Функция, которая отправляет письмо через HTTP API Brevo.
+    Это обычный HTTPS-запрос, поэтому он работает даже там, где SMTP закрыт.
+    Brevo принимает один вариант текста письма, поэтому отправляем HTML-версию.
     """
-    if not config.SMTP_HOST:
-        print("\n========== ПИСЬМО (почта не настроена, поэтому оно не отправлено) ==========")
-        print(f"Кому: {message['To']}")
-        print(f"Тема: {message['Subject']}")
-        print(f"Ссылка: {link}")
-        print("============================================================================\n")
-        return
+    body = {
+        "sender": {"name": config.MAIL_FROM_NAME, "email": config.MAIL_FROM},
+        "to": [{"email": message["To"]}],
+        "subject": message["Subject"],
+        "htmlContent": message.get_body(("html",)).get_content(),
+    }
+    request = urllib.request.Request(
+        BREVO_URL,
+        data=json.dumps(body).encode("utf-8"),
+        headers={
+            "api-key": config.BREVO_API_KEY,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            response.read()
+    except urllib.error.HTTPError as error:
+        # Brevo объясняет причину в теле ответа (например, «sender not valid») — печатаем её
+        print("Brevo ответил ошибкой:", error.code, error.read().decode("utf-8", "replace"))
+        raise
 
+
+def send_with_smtp(message):
+    """
+    Функция, которая отправляет письмо через обычный почтовый сервер (SMTP).
+    """
     if config.SMTP_PORT == 465:
         server = smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT, timeout=15)
     else:
@@ -56,6 +88,27 @@ def send_message(message, link):
     server.login(config.SMTP_USER, config.SMTP_PASSWORD)
     server.send_message(message)
     server.quit()
+
+
+def send_message(message, link):
+    """
+    Функция, которая отправляет готовое письмо первым настроенным способом.
+    Если почта не настроена совсем, письмо не отправляется,
+    а ссылка печатается в терминал — так удобно проверять локально.
+    """
+    if config.BREVO_API_KEY:
+        send_with_brevo(message)
+        return
+
+    if config.SMTP_HOST:
+        send_with_smtp(message)
+        return
+
+    print("\n========== ПИСЬМО (почта не настроена, поэтому оно не отправлено) ==========")
+    print(f"Кому: {message['To']}")
+    print(f"Тема: {message['Subject']}")
+    print(f"Ссылка: {link}")
+    print("============================================================================\n")
 
 
 def send_confirm_email(email, code):

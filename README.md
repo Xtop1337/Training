@@ -24,13 +24,14 @@ assets/trainer.css  стеклянное оформление тренажёро
 assets/site.js      тема, навигация, прогресс на главной, сброс прогресса
 assets/auth.css     стили кнопки аккаунта, окна входа, плашки лимита и замков на материалах
 assets/auth.js      аккаунт на всех страницах: вход и регистрация, прогресс в аккаунте, лимит 5 задач без входа, замки
-backend/            бэкенд на Python (Flask): аккаунты по почте и прогресс
+backend/            бэкенд на Python (Flask): аккаунты по почте и прогресс; база — SQLite у себя, Postgres на хостинге
 backend/app.py      сервер и адреса API: /api/register, /api/confirm, /api/login, /api/forgot, /api/reset, /api/progress и др.
-backend/database.py база SQLite: пользователи, сессии, ссылки из писем (подтверждение и смена пароля), прогресс
-backend/mailer.py   письма со ссылками: подтверждение почты и смена пароля
-backend/config.py   настройки: порт, адреса, почта для писем, разрешённые сайты (CORS)
+backend/database.py база (SQLite или Postgres): пользователи, сессии, ссылки из писем, прогресс
+backend/mailer.py   письма со ссылками (подтверждение почты, смена пароля) через Brevo или SMTP
+backend/config.py   настройки из переменных окружения: база, адреса, почта, разрешённые сайты (CORS)
 backend/.env.example образец файла backend/.env с паролем от почты (сам .env в git не попадает)
-backend/requirements.txt  зависимости Python (Flask)
+backend/requirements.txt  зависимости Python (Flask, gunicorn для хостинга, psycopg для Postgres)
+.vercelignore       что не выкладывать на Vercel (папку backend/)
 ```
 
 Вставки сайта в файлы тренажёров помечены комментариями `<!-- Training: … -->` и `/* Training: … */`. Логика задач не менялась: тренажёр только сообщает `assets/auth.js` о сохранении прогресса (`window.TrainerBridge`).
@@ -59,16 +60,48 @@ python backend/app.py
 Сервер запустится на http://127.0.0.1:5000, база `backend/training.db` создастся сама и в git не попадает.
 Аккаунты, лимит и замки включаются, когда сайт открыт на localhost.
 
-**Письма.** Пока почта не настроена, письма не отправляются, а ссылки (подтверждение почты, смена пароля) печатаются
-в терминал, где запущен сервер: открой её в браузере. Чтобы письма уходили по-настоящему, скопируй
-`backend/.env.example` в `backend/.env` и впиши SMTP-сервер, почту и пароль приложения (Яндекс, Mail.ru или Gmail).
+**Письма.** Пока почта не настроена, письма не отправляются, а ссылки (подтверждение почты, смена пароля)
+печатаются в терминал, где запущен сервер: открой ссылку в браузере. Чтобы письма уходили по-настоящему,
+скопируй `backend/.env.example` в `backend/.env` и впиши ключ Brevo или данные SMTP-сервера.
 
 **GitHub Pages.** Пока бэкенд не выложен на хостинг, на сайте всё работает как раньше: без аккаунтов,
-лимита и замков. Чтобы включить, выложи бэкенд, впиши его адрес в `PRODUCTION_API_URL` в `assets/auth.js`,
-а в `backend/.env` на хостинге — `API_URL` (адрес сервера), `SITE_URL=https://xtop1337.github.io/Training` и `DEBUG=0`.
+лимита и замков. Как выложить — в разделе «Деплой» ниже.
 
 Лимит и замки работают в браузере, поэтому опытный пользователь может их обойти, а PDF из папки `pdf/`
 лежат в открытом репозитории. Для настоящей защиты PDF нужно убрать из репозитория и отдавать через бэкенд только вошедшим.
+
+## Деплой: сайт на Vercel, бэкенд на Render
+
+Бесплатный Render стирает файлы при каждом перезапуске и засыпании (после 15 минут без запросов)
+и не даёт отправлять почту через SMTP. Поэтому на хостинге база — Postgres на [Neon](https://neon.com),
+а письма уходят через HTTP API [Brevo](https://www.brevo.com). Код сам выбирает нужный вариант по переменным окружения.
+
+1. **База — Neon.** Создать проект и скопировать строку подключения вида
+   `postgresql://user:password@ep-....neon.tech/neondb?sslmode=require`. Таблицы сервер создаст сам.
+2. **Письма — Brevo.** В настройках создать API-ключ (SMTP & API → API Keys) и подтвердить
+   адрес отправителя (Senders). Без подтверждённого отправителя Brevo письма не отправит.
+3. **Бэкенд — Render** → New → Web Service → репозиторий:
+   - Root Directory: `backend`
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
+   - Health Check Path: `/api/health`
+   - Environment:
+
+     | Переменная | Значение |
+     |---|---|
+     | `DATABASE_URL` | строка подключения из Neon |
+     | `BREVO_API_KEY` | ключ из Brevo |
+     | `MAIL_FROM` | подтверждённый в Brevo адрес отправителя |
+     | `API_URL` | адрес сервиса на Render, например `https://training-api.onrender.com` |
+     | `SITE_URL` | адрес сайта на Vercel, например `https://training.vercel.app` |
+     | `ALLOWED_ORIGINS` | адрес сайта на Vercel (несколько — через запятую) |
+     | `DEBUG` | `0` |
+4. **Сайт — Vercel** → Add New → Project → тот же репозиторий: Framework Preset `Other`,
+   Build Command и Output Directory не заполнять. Папку `backend/` Vercel не выкладывает (`.vercelignore`).
+5. Вписать адрес Render в `PRODUCTION_API_URL` в `assets/auth.js`, закоммитить и запушить —
+   Vercel и Render пересоберутся сами.
+
+Бесплатный Render засыпает без запросов, поэтому первый запрос после перерыва может идти около минуты.
 
 ## Авторы
 
