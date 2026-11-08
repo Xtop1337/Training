@@ -35,11 +35,6 @@ python3 -m http.server 8000
 
 и открыть http://localhost:8000.
 
-## Публикация на GitHub Pages
-
-Settings → Pages → Source: **Deploy from a branch**, ветка `main`, папка `/ (root)`.
-Через минуту сайт будет на `https://xtop1337.github.io/Training/`.
-
 ## Автор
 
 Сделал [Xtop1337](https://github.com/Xtop1337).
