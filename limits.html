@@ -1,0 +1,2303 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Пределы: тренажёр и калькулятор с решением · Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F9FD; --surface:#FFFFFF; --grid:rgba(40,80,160,.07); --ink:#1A2660; --muted:#5B6478;
+  --margin:#C3343F; --ok:#23704A; --bad:#B3261E; --line:#D5DDEE; --hover:rgba(26,38,96,.06); --accent:#2B59C3;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#10141F; --surface:#161B29; --grid:rgba(140,170,255,.06); --ink:#DCE3F7; --muted:#98A2BC;
+    --margin:#FF6B74; --ok:#5FD08F; --bad:#FF8A80; --line:#2A3248; --hover:rgba(220,227,247,.06); --accent:#8FB0FF;
+    color-scheme:dark;
+  }
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; color:var(--ink); background:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  font:16px/1.55 "Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+.serif,.q,.steps,h1,h2,.formula,.big{font-family:"STIX Two Text","Cambria Math","Times New Roman",serif}
+.wrap{max-width:1160px;margin:0 auto;padding:24px 20px 64px;display:grid;grid-template-columns:290px minmax(0,1fr);gap:28px}
+header.top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;border-bottom:2px solid var(--ink);padding-bottom:14px;flex-wrap:wrap}
+h1{font-weight:600;font-size:clamp(28px,4.2vw,42px);margin:0;line-height:1.08}
+.sub{color:var(--muted);margin:6px 0 0;max-width:62ch}
+.overall{min-width:200px;font-size:14px;color:var(--muted)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
+nav ol{list-style:none;margin:0;padding:0}
+nav li button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:baseline;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:15px;line-height:1.3}
+nav li button:hover{background:var(--hover)}
+nav li button[aria-current="true"]{background:var(--surface);box-shadow:inset 3px 0 0 var(--margin)}
+nav .n{font-family:"STIX Two Text",serif;color:var(--muted)}
+nav .c{font-size:13px;color:var(--muted);white-space:nowrap}
+nav .c.done{color:var(--ok);font-weight:600}
+.tools{display:grid;gap:8px;margin-bottom:18px}
+.tools button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);font-weight:500;line-height:1.25}
+.tools button:hover{border-color:var(--ink)}
+.tools button[aria-current="true"]{border-color:var(--margin);box-shadow:inset 3px 0 0 var(--margin)}
+.tools .ic{font-family:"STIX Two Text",serif;font-size:20px;width:26px;text-align:center;color:var(--margin)}
+.tools small{display:block;color:var(--muted);font-weight:400;font-size:12.5px}
+.navhead{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 10px 6px}
+.side-actions{margin-top:16px;display:grid;gap:8px}
+select.mob{display:none;width:100%;font:inherit;padding:10px;border:1.5px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+button.btn{font:inherit;font-weight:500;border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:6px;cursor:pointer}
+button.btn:hover{background:var(--hover)}
+button.btn.primary{background:var(--ink);color:var(--surface)}
+button.btn.ghost{border-color:var(--line)}
+button.btn.sm{padding:5px 10px;font-size:14px}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--margin);outline-offset:2px}
+main{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:26px 32px 32px 60px;min-width:0}
+main::before{content:"";position:absolute;left:38px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.65}
+.lect{color:var(--muted);font-size:14px}
+h2{font-size:30px;margin:2px 0 16px;font-weight:600;line-height:1.15}
+h3{font-size:17px;margin:22px 0 8px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;overflow-x:auto}
+.tabs button{all:unset;cursor:pointer;padding:8px 12px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--ink)}
+.theory{padding-left:20px;margin:0}
+.theory li{margin:9px 0}
+.m{font-family:"STIX Two Text","Cambria Math",serif;font-size:1.08em}
+.q{font-size:21px;line-height:1.8;margin:6px 0 18px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.9em;margin:0 2px;line-height:1.25}
+.fr>span:first-child{border-bottom:1px solid currentColor;padding:0 4px 1px}
+.fr>span:last-child{padding:1px 4px 0}
+.rad{white-space:nowrap}
+.rad .ov{border-top:1px solid currentColor;padding:1px 2px 0 1px;margin-left:1px}
+sup{font-size:.68em;line-height:0}
+sup .fr{font-size:.85em}
+.why{font-family:"Golos Text",system-ui,sans-serif;font-size:13px;color:var(--muted);margin-left:6px}
+.dots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.dots button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:13px}
+.dots button.ok{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.dots button[aria-current="true"]{border-color:var(--ink);border-width:2px}
+.ansrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ansrow label{font-family:"STIX Two Text",serif;font-size:20px;white-space:nowrap}
+input.ans{font:19px/1.3 "STIX Two Text",serif;padding:8px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);flex:1 1 220px;min-width:0}
+input.ans:focus{border-color:var(--ink);outline:none}
+input.small{flex:0 0 120px}
+.keys{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+.keys button{font:16px "STIX Two Text",serif;line-height:1.2;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:4px;padding:4px 10px;cursor:pointer;min-width:34px}
+.preview{min-height:34px;margin-top:8px;font-family:"STIX Two Text",serif;font-size:20px;line-height:1.9;color:var(--ink)}
+.preview .lbl{font-family:"Golos Text",sans-serif;font-size:13px;color:var(--muted);margin-right:8px}
+.preview.err{font-family:"Golos Text",sans-serif;font-size:14px;color:var(--bad)}
+.choices{display:grid;gap:8px;max-width:600px}
+.choices button{text-align:left;font:inherit;padding:10px 14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:6px;cursor:pointer}
+.choices button.right{border-color:var(--ok);box-shadow:inset 4px 0 0 var(--ok)}
+.choices button.wrong{border-color:var(--bad);box-shadow:inset 4px 0 0 var(--bad)}
+.fb{margin-top:12px;font-weight:500}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.panel{margin-top:14px;padding:12px 16px;border-left:3px solid var(--line);background:var(--paper);overflow-x:auto}
+.panel h4{margin:0 0 6px;font-size:14px;color:var(--muted);font-weight:600}
+.panel.auto{border-left-color:var(--accent)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.help{font-size:13px;color:var(--muted);margin-top:6px;max-width:72ch}
+.steps{font-size:19px;line-height:1.75}
+.steps ol{padding-left:24px;margin:6px 0}
+.steps ol ol{padding-left:22px;border-left:1px dashed var(--line);margin-left:2px}
+.steps li{margin:5px 0}
+.steps b{font-weight:600}
+.note{font-size:14px;color:var(--muted);border-top:1px dashed var(--line);margin-top:20px;padding-top:10px}
+.result{font-size:48px;font-family:"STIX Two Text",serif;margin:8px 0}
+.navrow{display:flex;justify-content:space-between;gap:8px;margin-top:24px;flex-wrap:wrap}
+.answer{margin:14px 0 4px;padding:14px 18px;border:1.5px solid var(--ok);border-radius:8px;background:var(--paper);overflow-x:auto}
+.answer .big{font-size:24px;line-height:1.9}
+.answer .plain{font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;color:var(--muted);margin-top:6px;word-break:break-all}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+.chips button{font:15px "STIX Two Text",serif;border:1px dashed var(--line);background:transparent;color:var(--ink);border-radius:14px;padding:3px 11px;cursor:pointer}
+.chips button:hover{border-style:solid;border-color:var(--ink)}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{all:unset;cursor:pointer;padding:6px 12px;font-family:"STIX Two Text",serif;font-size:17px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:12px}
+details{margin-top:10px}
+details summary{cursor:pointer;color:var(--accent);font-weight:500}
+.stat{font-size:14px;color:var(--muted)}
+.stat b{color:var(--ink)}
+@media (max-width:860px){
+  .wrap{grid-template-columns:1fr;gap:18px;padding:16px 12px 48px}
+  nav ol,.navhead{display:none}
+  select.mob{display:block}
+  .tools{grid-template-columns:1fr 1fr}
+  .tools small{display:none}
+  .side-actions{grid-template-columns:1fr 1fr}
+  main{padding:20px 16px 24px 36px}
+  main::before{left:20px}
+  .q{font-size:19px}
+  h2{font-size:25px}
+  .steps{font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.lim{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin-right:3px;font-style:normal}
+.lim sub{font-size:.58em;line-height:1.25;vertical-align:baseline;white-space:nowrap}
+.q .lim{font-size:1em}
+.tools .ic{width:auto;min-width:30px}
+.chips .lim sub{font-size:.62em}
+</style>
+<!-- Training: оформление «жидкое стекло» -->
+<meta name="theme-color" content="#E8EDF7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#080C1B" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/glass.css">
+<link rel="stylesheet" href="assets/trainer.css">
+<script>try{var t=localStorage.getItem('training-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body data-page="trainer" data-topic="limits">
+<!-- Training: фон и верхняя панель сайта -->
+<div class="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<header class="sitebar">
+  <div class="sitebar__in glass" data-sheen>
+    <a class="brand" href="index.html" aria-label="Training, на главную"><span class="brand__mark">∫</span><span class="brand__name">Training</span></a>
+    <nav class="seg-nav seg-nav--topics" aria-label="Тренажёры">
+      <span class="seg-nav__drop" aria-hidden="true"></span>
+      <a href="limits.html" aria-current="page" title="Пределы"><span class="g" aria-hidden="true">lim</span><span class="t">Пределы</span></a>
+      <a href="derivatives.html" title="Производные"><span class="g" aria-hidden="true">y′</span><span class="t">Производные</span></a>
+      <a href="integrals.html" title="Интегралы"><span class="g" aria-hidden="true">∫</span><span class="t">Интегралы</span></a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" type="button" data-mode="system" aria-label="Тема: как в системе" title="Тема: как в системе">
+      <svg class="i i-system" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/></svg>
+      <svg class="i i-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      <svg class="i i-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/></svg>
+    </button>
+  </div>
+</header>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Пределы: от подстановки до Лопиталя</h1>
+      <p class="sub">Тренажёр по всем видам пределов: 14 тем с теорией, разбором и задачами, калькулятор, который раскрывает любую неопределённость по шагам, и бесконечный генератор задач.</p>
+    </div>
+    <div class="overall"><span id="ovText"></span><div class="bar"><i id="ovBar"></i></div></div>
+  </header>
+  <aside>
+    <div class="tools">
+      <button data-mode="calc"><span class="ic">lim</span><span>Калькулятор с решением<small>введи любой предел — получи шаги</small></span></button>
+      <button data-mode="gen"><span class="ic">∞</span><span>Генератор задач<small>бесконечная практика, 3 уровня</small></span></button>
+    </div>
+    <div class="navhead">Темы</div>
+    <nav aria-label="Темы"><ol id="nav"></ol></nav>
+    <select class="mob" id="mob" aria-label="Тема"></select>
+    <!-- Training: материалы к теме -->
+    <div class="side-head">Материалы</div>
+    <div class="side-docs">
+      <a class="doc-link" href="pdf/limits-cheatsheet.pdf" target="_blank" rel="noopener"><span class="doc-link__ic ">PDF</span><span>Шпаргалка<small>3 страницы: алгоритм и методы</small></span></a>
+      <a class="doc-link" href="pdf/limits-guide.pdf" target="_blank" rel="noopener"><span class="doc-link__ic alt">PDF</span><span>Разбор «Как найти любой предел»<small>10 страниц с примерами</small></span></a>
+    </div>
+    <div class="side-actions">
+      <button class="btn primary" id="examBtn">Контрольная: 10 задач</button>
+      <button class="btn ghost" id="resetBtn">Сбросить прогресс</button>
+    </div>
+  </aside>
+  <main id="main" aria-live="polite"></main>
+</div>
+<script>
+/* ===================== Движок производных =====================
+   Парсер → AST → производная → упрощение → вывод (HTML / текст) + пошаговое объяснение.
+   Без внешних зависимостей, работает офлайн. */
+const DX=(function(){
+'use strict';
+/* ---------- рациональные числа ---------- */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t}return a||1}
+function num(p,q=1){
+  if(!Number.isFinite(p)||!Number.isFinite(q))return {t:'num',p:p/q,q:1,fl:true};
+  if(!Number.isInteger(p)||!Number.isInteger(q)){
+    const v=p/q;
+    for(const Q of [1,2,3,4,5,6,8,10,12,16,100,1000,10000,100000,1000000]){const P=Math.round(v*Q);if(Math.abs(P/Q-v)<1e-12)return num(P,Q)}
+    return {t:'num',p:v,q:1,fl:true};
+  }
+  if(q<0){p=-p;q=-q}const g=gcd(p,q);return {t:'num',p:p/g,q:q/g};
+}
+const val=n=>n.p/n.q;
+const isNum=(N,v)=>N.t==='num'&&(v===undefined||val(N)===v);
+const isInt=N=>N.t==='num'&&N.q===1&&Number.isInteger(N.p);
+function radd(a,b){return num(a.p*b.q+b.p*a.q,a.q*b.q)}
+function rmul(a,b){return num(a.p*b.p,a.q*b.q)}
+function rpow(a,k){ // k — целое
+  if(k===0)return num(1);
+  const n=Math.abs(k);const p=Math.pow(a.p,n),q=Math.pow(a.q,n);
+  if(!Number.isSafeInteger(p)||!Number.isSafeInteger(q))return null;
+  return k>0?num(p,q):num(q,p);
+}
+function iroot(n,k){if(n<0){if(k%2===0)return null;const r=iroot(-n,k);return r===null?null:-r}const r=Math.round(Math.pow(n,1/k));for(const c of [r-1,r,r+1])if(c>=0&&Math.pow(c,k)===n)return c;return null}
+
+/* ---------- конструкторы ---------- */
+const N0=num(0),N1=num(1),NM1=num(-1),HALF=num(1,2);
+const V=n=>({t:'v',n});
+const X=V('x');
+const C=n=>({t:'c',n});
+const add=a=>({t:'add',a});
+const mul=a=>({t:'mul',a});
+const div=(a,b)=>({t:'div',a,b});
+const pow=(a,b)=>({t:'pow',a,b});
+const neg=a=>({t:'neg',a});
+const fn=(f,a)=>({t:'fn',f,a});
+
+/* ---------- токенизатор и парсер ---------- */
+const FN_ALIAS={sin:'sin',cos:'cos',tg:'tg',tan:'tg',ctg:'ctg',cot:'ctg',arcsin:'arcsin',arccos:'arccos',arctg:'arctg',arctan:'arctg',arcctg:'arcctg',arccot:'arcctg',asin:'arcsin',acos:'arccos',atan:'arctg',acot:'arcctg',
+  ln:'ln',log:'ln',lg:'lg',exp:'exp',sqrt:'sqrt',cbrt:'cbrt',abs:'abs',sh:'sh',sinh:'sh',ch:'ch',cosh:'ch',th:'th',tanh:'th',cth:'cth',coth:'cth'};
+const IDS={pi:'pi',e:'e',x:'x',y:'y',t:'t',inf:'inf',n:'x'};
+const NAMES=[...Object.keys(FN_ALIAS),...Object.keys(IDS)].sort((a,b)=>b.length-a.length);
+const SUP={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-'};
+function normalize(s){
+  s=String(s).toLowerCase().replace(/\^\s*(\d+)\s+/g,'^($1)').replace(/\s+/g,' ').trim();
+  if(s.includes('='))s=s.slice(s.lastIndexOf('=')+1);
+  s=s.replace(/[·×∙⋅]/g,'*').replace(/[−–—]/g,'-').replace(/,/g,'.').replace(/÷/g,'/').replace(/[′'’]/g,'')
+     .replace(/π/g,'pi').replace(/∞/g,'inf').replace(/√/g,'sqrt').replace(/∛/g,'cbrt').replace(/\*\*/g,'^');
+  s=s.replace(/[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+/g,m=>'^('+[...m].map(c=>SUP[c]).join('')+')');
+  s=s.replace(/[½⅓⅔¼¾⅕⅙⅛]/g,c=>'('+{'½':'1/2','⅓':'1/3','⅔':'2/3','¼':'1/4','¾':'3/4','⅕':'1/5','⅙':'1/6','⅛':'1/8'}[c]+')').replace(/ˣ/g,'^x');
+  return s;
+}
+function tokenize(src){
+  const s=normalize(src);const t=[];let i=0;let spB=false;
+  const push=o=>{if('+-*/'.includes(o.k))o.sb=spB;else o.ws=spB;spB=false;t.push(o)};
+  while(i<s.length){
+    const c=s[i];
+    if(c===' '){const L=t[t.length-1];if(L&&'+-*/'.includes(L.k))L.sa=true;spB=true;i++;continue}
+    if(/[0-9.]/.test(c)){let j=i;while(j<s.length&&/[0-9.]/.test(s[j]))j++;const str=s.slice(i,j);
+      if((str.match(/\./g)||[]).length>1||str==='.')throw new Error('Не получилось прочитать число «'+str+'»');
+      const [a,b='']=str.split('.');push({k:'n',v:num(parseInt((a||'0')+b,10),Math.pow(10,b.length))});i=j;continue}
+    if('+-*/^()'.includes(c)){push({k:c});i++;continue}
+    if(c==='['||c==='{'){push({k:'('});i++;continue}
+    if(c===']'||c==='}'){push({k:')'});i++;continue}
+    if(c==='|'){push({k:'|'});i++;continue}
+    const m=NAMES.find(n=>s.startsWith(n,i));
+    if(!m)throw new Error('Непонятный символ «'+s.slice(i,i+3)+'»');
+    push(FN_ALIAS[m]?{k:'f',v:FN_ALIAS[m]}:{k:'id',v:IDS[m]});i+=m.length;
+  }
+  if(!t.length)throw new Error('Пустой ввод');
+  return t;
+}
+function applyFn(f,a){
+  if(f==='sqrt')return pow(a,HALF);
+  if(f==='cbrt')return pow(a,num(1,3));
+  if(f==='exp')return pow(C('e'),a);
+  return fn(f,a);
+}
+function parse(src){
+  const t=tokenize(src);let p=0;let absDepth=0;
+  const peek=()=>t[p];
+  const isAtomStart=tk=>tk&&(tk.k==='n'||tk.k==='id'||tk.k==='f'||tk.k==='('||(tk.k==='|'&&absDepth===0));
+  // Пробелы вокруг знака ослабляют его: «x+1 / x-1» = (x+1)/(x−1), «- 5/x» = −(5/x), а «-5/x» = (−5)/x
+  const loose=tk=>!!(tk&&(tk.sb||tk.sa));
+  const divJoin=(a,b)=>(a.t==='num'&&b.t==='num'&&!a.fl&&!b.fl&&b.p!==0)?num(a.p*b.q,a.q*b.p):div(a,b);
+  function expr(){
+    const terms=[lterm()];
+    while(peek()&&(peek().k==='+'||peek().k==='-')&&loose(peek())){const o=t[p++].k;const b=lterm();terms.push(o==='+'?b:neg(b))}
+    return terms.length===1?terms[0]:add(terms);
+  }
+  function lterm(){
+    let a=lunary();
+    for(;;){const tk=peek();
+      if(tk&&(tk.k==='*'||tk.k==='/')&&loose(tk)){p++;const b=lunary();a=tk.k==='*'?mulJoin(a,b):divJoin(a,b)}
+      else if(tk&&tk.ws&&isAtomStart(tk)){a=mulJoin(a,lunary())} // «1/2 ln x» = ½·ln x: множитель через пробел слабее деления
+      else break}
+    return a;
+  }
+  function lunary(){const tk=peek();
+    if(tk&&tk.k==='-'&&tk.sa){p++;return neg(lterm())}
+    if(tk&&tk.k==='+'&&tk.sa){p++;return lterm()}
+    return texpr()}
+  function texpr(){
+    const terms=[term()];
+    while(peek()&&(peek().k==='+'||peek().k==='-')&&!loose(peek())){const o=t[p++].k;const b=term();terms.push(o==='+'?b:neg(b))}
+    return terms.length===1?terms[0]:add(terms);
+  }
+  // Умножение без знака связывает сильнее, чем / и *:  1/2sqrt(x) = 1/(2√x),  1/2x = 1/(2x)
+  function term(){
+    let a=chunk();
+    for(;;){const tk=peek();
+      if(tk&&tk.k==='*'&&!loose(tk)){p++;a=mulJoin(a,chunk())}
+      else if(tk&&tk.k==='/'&&!loose(tk)){p++;a=divJoin(a,chunk())}
+      else break}
+    return a;
+  }
+  function chunk(){
+    let a=unary();
+    while(isAtomStart(peek())&&!peek().ws){const b=power();a=(a.t==='mul'&&!a.paren&&a.chunk)?mul([...a.a,b]):mul([a,b]);a.chunk=true}
+    return a;
+  }
+  function mulJoin(a,b){return a.t==='mul'&&!a.paren?mul([...a.a,b]):mul([a,b])}
+  function unary(){const tk=peek();if(tk&&tk.k==='-'){p++;const a=unary();return a.t==='num'?num(-a.p,a.q):neg(a)}if(tk&&tk.k==='+'){p++;return unary()}return power()}
+  function power(){
+    const b=call();
+    if(peek()&&peek().k==='^'){p++;return pow(b,exponent())}
+    return b;
+  }
+  function exponent(){ // e^2x → e^(2x), e^-x → e^(-x)
+    const tk=peek();
+    if(tk&&tk.k==='-'){p++;return neg(exponent())}
+    if(tk&&tk.k==='n'){p++;let e={t:'num',...tk.v};
+      if(peek()&&peek().k==='id'&&peek().v==='x'&&!(t[p+1]&&t[p+1].k==='^')){p++;e=mul([e,X])}
+      return e}
+    return call();
+  }
+  function call(){
+    const tk=peek();
+    if(tk&&tk.k==='f'){p++;
+      let k=null; // sin^2 x
+      if(peek()&&peek().k==='^'){p++;
+        if(peek()&&peek().k==='n'){k={t:'num',...t[p++].v}}
+        else if(peek()&&peek().k==='-'&&t[p+1]&&t[p+1].k==='n'){p++;const v=t[p++].v;k=num(-v.p,v.q)}
+        else k=primary()}
+      let a;
+      if(peek()&&peek().k==='('){a=primary();if(peek()&&peek().k==='^'&&k===null){p++;const r=applyFn(tk.v,a);return pow(r,exponent())}}
+      else a=tight();
+      const r=applyFn(tk.v,a);
+      return k?pow(r,k):r;
+    }
+    return primary();
+  }
+  function tight(){ // аргумент без скобок: sin 2x, ln x^2, tg3x
+    const fs=[];
+    if(peek()&&peek().k==='-'){p++;return neg(tight())}
+    if(peek()&&peek().k==='n'){fs.push(power())}
+    while(peek()&&!(fs.length&&peek().ws)&&(peek().k==='id'||peek().k==='('||(peek().k==='|'&&(absDepth===0||fs.length===0)))){fs.push(power())}
+    if(!fs.length){if(peek()&&peek().k==='f')return call();throw new Error('После имени функции нужен аргумент')}
+    return fs.length===1?fs[0]:mul(fs);
+  }
+  function primary(){
+    const tk=t[p++];if(!tk)throw new Error('Выражение оборвалось');
+    if(tk.k==='n')return {t:'num',...tk.v};
+    if(tk.k==='id'){if(tk.v==='e')return C('e');if(tk.v==='pi')return C('pi');if(tk.v==='inf')return {t:'num',p:Infinity,q:1,fl:true};return V(tk.v)}
+    if(tk.k==='('){const a=expr();if(!peek()||peek().k!==')')throw new Error('Не хватает закрывающей скобки');p++;if(a.t==='mul')a.paren=true;return a}
+    if(tk.k==='|'){absDepth++;const a=expr();absDepth--;if(!peek()||peek().k!=='|')throw new Error('Не закрыт модуль |…|');p++;return fn('abs',a)}
+    throw new Error('Лишний знак «'+tk.k+'»');
+  }
+  const r=expr();
+  if(p!==t.length){const tk=t[p];throw new Error(tk.k===')'?'Лишняя закрывающая скобка':'Не получилось разобрать выражение до конца')}
+  return tidy(strip(r));
+}
+function strip(N){ // убрать служебные пометки
+  if(N.t==='mul')return mul(N.a.map(strip));
+  if(N.t==='add')return add(N.a.map(strip));
+  if(N.t==='div'||N.t==='pow')return {t:N.t,a:strip(N.a),b:strip(N.b)};
+  if(N.t==='neg')return neg(strip(N.a));
+  if(N.t==='fn')return fn(N.f,strip(N.a));
+  return N;
+}
+
+/* лёгкая нормализация ввода: свёртка чисел, без перестановки структуры */
+function tidy(N){
+  switch(N.t){
+    case 'neg':{const a=tidy(N.a);if(a.t==='num')return num(-a.p,a.q);if(a.t==='mul'&&a.a[0].t==='num')return mul([num(-a.a[0].p,a.a[0].q),...a.a.slice(1)]);return neg(a)}
+    case 'mul':{let c=N1;const r=[];for(const f0 of N.a){const f=tidy(f0);if(f.t==='num')c=rmul(c,f);else if(f.t==='mul'){for(const g of f.a){if(g.t==='num')c=rmul(c,g);else r.push(g)}}else if(f.t==='neg'){c=rmul(c,NM1);r.push(f.a)}else r.push(f)}
+      if(isNum(c,0))return N0;if(!r.length)return c;if(isNum(c,1))return r.length===1?r[0]:mul(r);return mul([c,...r])}
+    case 'add':{const r=[];for(const a of N.a){const t=tidy(a);if(t.t==='add')r.push(...t.a);else r.push(t)}return add(r)}
+    case 'div':{const a=tidy(N.a),b=tidy(N.b);if(a.t==='num'&&b.t==='num'&&!a.fl&&!b.fl)return num(a.p*b.q,a.q*b.p);return div(a,b)}
+    case 'pow':return pow(tidy(N.a),tidy(N.b));
+    case 'fn':return fn(N.f,tidy(N.a));
+  }
+  return N;
+}
+
+/* ---------- вычисление ---------- */
+const FEV={sin:Math.sin,cos:Math.cos,tg:Math.tan,ctg:x=>1/Math.tan(x),arcsin:Math.asin,arccos:Math.acos,arctg:Math.atan,arcctg:x=>Math.PI/2-Math.atan(x),
+  ln:Math.log,lg:Math.log10,abs:Math.abs,sh:Math.sinh,ch:Math.cosh,th:Math.tanh,cth:x=>1/Math.tanh(x)};
+function ev(N,env){
+  switch(N.t){
+    case 'num':return val(N);
+    case 'v':{const v=typeof env==='number'?(N.n==='x'?env:NaN):env[N.n];return v===undefined?NaN:v}
+    case 'c':return N.n==='e'?Math.E:Math.PI;
+    case 'add':return N.a.reduce((s,a)=>s+ev(a,env),0);
+    case 'mul':return N.a.reduce((s,a)=>s*ev(a,env),1);
+    case 'div':return ev(N.a,env)/ev(N.b,env);
+    case 'neg':return -ev(N.a,env);
+    case 'pow':{const b=ev(N.a,env),e=ev(N.b,env);
+      if(b<0&&!Number.isInteger(e)){for(const q of [3,5,7,9,15]){const m=e*q;if(Math.abs(m-Math.round(m))<1e-12){const r=Math.pow(-b,e);return Math.round(m)%2===0?r:-r}}}
+      return Math.pow(b,e)}
+    case 'fn':return FEV[N.f](ev(N.a,env));
+  }
+  return NaN;
+}
+
+/* ---------- зависимость и подстановка ---------- */
+function has(N,x='x'){
+  switch(N.t){case 'v':return N.n===x;case 'num':case 'c':return false;
+    case 'add':case 'mul':return N.a.some(a=>has(a,x));
+    case 'div':case 'pow':return has(N.a,x)||has(N.b,x);
+    default:return has(N.a,x)}
+}
+function subst(N,x,R){
+  switch(N.t){case 'v':return N.n===x?R:N;case 'num':case 'c':return N;
+    case 'add':return add(N.a.map(a=>subst(a,x,R)));case 'mul':return mul(N.a.map(a=>subst(a,x,R)));
+    case 'div':case 'pow':return {t:N.t,a:subst(N.a,x,R),b:subst(N.b,x,R)};
+    case 'neg':return neg(subst(N.a,x,R));case 'fn':return fn(N.f,subst(N.a,x,R))}
+}
+function key(N){
+  switch(N.t){case 'num':return N.fl?'#'+N.p:'#'+N.p+'/'+N.q;case 'v':return N.n;case 'c':return '@'+N.n;
+    case 'add':return '+('+N.a.map(key).sort().join(',')+')';case 'mul':return '*('+N.a.map(key).join(',')+')';
+    case 'div':return '/('+key(N.a)+','+key(N.b)+')';case 'pow':return '^('+key(N.a)+','+key(N.b)+')';
+    case 'neg':return '-('+key(N.a)+')';case 'fn':return N.f+'('+key(N.a)+')'}
+}
+const eq=(a,b)=>key(a)===key(b);
+
+/* ---------- производная ---------- */
+function outerD(f,w){ // f′(w)
+  switch(f){
+    case 'sin':return fn('cos',w);
+    case 'cos':return neg(fn('sin',w));
+    case 'tg':return div(N1,pow(fn('cos',w),num(2)));
+    case 'ctg':return neg(div(N1,pow(fn('sin',w),num(2))));
+    case 'arcsin':return div(N1,pow(add([N1,neg(pow(w,num(2)))]),HALF));
+    case 'arccos':return neg(div(N1,pow(add([N1,neg(pow(w,num(2)))]),HALF)));
+    case 'arctg':return div(N1,add([N1,pow(w,num(2))]));
+    case 'arcctg':return neg(div(N1,add([N1,pow(w,num(2))])));
+    case 'ln':return div(N1,w);
+    case 'lg':return div(N1,mul([w,fn('ln',num(10))]));
+    case 'sh':return fn('ch',w);
+    case 'ch':return fn('sh',w);
+    case 'th':return div(N1,pow(fn('ch',w),num(2)));
+    case 'cth':return neg(div(N1,pow(fn('sh',w),num(2))));
+    case 'abs':return div(w,fn('abs',w));
+  }
+  throw new Error('Нет правила для '+f);
+}
+function d(N,x='x'){
+  if(!has(N,x))return N0;
+  switch(N.t){
+    case 'v':return N1;
+    case 'add':return add(N.a.map(a=>d(a,x)));
+    case 'neg':return neg(d(N.a,x));
+    case 'mul':{const terms=[];N.a.forEach((f,i)=>{if(has(f,x))terms.push(mul(N.a.map((g,j)=>j===i?d(g,x):g)))});return terms.length===1?terms[0]:add(terms)}
+    case 'div':{
+      if(!has(N.b,x))return div(d(N.a,x),N.b);
+      return div(add([mul([d(N.a,x),N.b]),neg(mul([N.a,d(N.b,x)]))]),pow(N.b,num(2)));
+    }
+    case 'pow':{const A=N.a,B=N.b;
+      if(!has(B,x))return mul([B,pow(A,add([B,NM1])),d(A,x)]);
+      if(!has(A,x))return mul([N,fn('ln',A),d(B,x)]);
+      return mul([N,d(mul([B,fn('ln',A)]),x)]);
+    }
+    case 'fn':return mul([outerD(N.f,N.a),d(N.a,x)]);
+  }
+}
+
+/* ---------- упрощение ---------- */
+function S(N){
+  switch(N.t){
+    case 'num':case 'v':case 'c':return N;
+    case 'neg':return mulS([NM1,S(N.a)]);
+    case 'add':return addS(N.a.map(S));
+    case 'mul':return mulS(N.a.map(S));
+    case 'div':return mulS([S(N.a),powS(S(N.b),NM1)]);
+    case 'pow':return powS(S(N.a),S(N.b));
+    case 'fn':return fnS(N.f,S(N.a));
+  }
+}
+function splitCoef(T){ // терм → [коэффициент, остаток]
+  if(T.t==='num')return [T,null];
+  if(T.t==='mul'&&T.a[0].t==='num'){const rest=T.a.slice(1);return [T.a[0],rest.length===1?rest[0]:mul(rest)]}
+  return [N1,T];
+}
+/* многочлены: Map(степень → коэффициент) */
+function toPoly(N,depth=0){
+  if(depth>6)return null;
+  switch(N.t){
+    case 'num':return N.fl?null:new Map([[0,N]]);
+    case 'v':return N.n==='x'?new Map([[1,N1]]):null;
+    case 'add':{let P=new Map();for(const a of N.a){const Q=toPoly(a,depth+1);if(!Q)return null;P=pAdd(P,Q)}return P}
+    case 'mul':{let P=new Map([[0,N1]]);for(const a of N.a){const Q=toPoly(a,depth+1);if(!Q)return null;P=pMul(P,Q);if(P.size>12)return null}return P}
+    case 'neg':{const Q=toPoly(N.a,depth+1);return Q?pMul(Q,new Map([[0,NM1]])):null}
+    case 'pow':{if(!isInt(N.b)||N.b.p<0||N.b.p>4)return null;const Q=toPoly(N.a,depth+1);if(!Q)return null;if(Q.size>1&&N.b.p>3)return null;let P=new Map([[0,N1]]);for(let i=0;i<N.b.p;i++)P=pMul(P,Q);return P}
+  }
+  return null;
+}
+function pAdd(P,Q){const R=new Map(P);for(const [k,c] of Q)R.set(k,R.has(k)?radd(R.get(k),c):c);return R}
+function pMul(P,Q){let R=new Map();for(const [a,c] of P)for(const [b,e] of Q){const k=a+b,v=rmul(c,e);R.set(k,R.has(k)?radd(R.get(k),v):v)}return R}
+function fromPolyTerms(P){
+  return [...P.entries()].filter(([k,c])=>!isNum(c,0)).sort((a,b)=>b[0]-a[0]).map(([k,c])=>{
+    const xp=k===0?null:(k===1?X:pow(X,num(k)));
+    if(!xp)return c;return isNum(c,1)?xp:mul([c,xp]);
+  });
+}
+function polyLike(T){ // стоит ли раскрывать терм как многочлен
+  if(T.t==='num'||T.t==='v')return true;
+  if(T.t==='pow')return (T.a.t==='v'&&isInt(T.b))||(T.a.t==='add'&&isInt(T.b)&&T.b.p>=0&&T.b.p<=3&&toPoly(T.a)!==null);
+  if(T.t==='mul')return T.a.every(f=>f.t==='num'||f.t==='v'||f.t==='add'||(f.t==='pow'&&isInt(f.b)&&f.b.p>=0&&(f.a.t==='v'||f.a.t==='add')));
+  return false;
+}
+function addS(terms){
+  const flat0=[];for(const t of terms){if(t.t==='add')flat0.push(...t.a);else flat0.push(t)}
+  // раскрываем многочленную часть
+  const flat=[];let P=null,pos=-1;
+  for(const t of flat0){
+    const Q=polyLike(t)?toPoly(t):null;
+    if(Q){if(!P){P=new Map();pos=flat.length;flat.push(null)}P=pAdd(P,Q)}
+    else if(t.t==='mul'&&t.a.length===2&&t.a[0].t==='num'&&t.a[1].t==='add'){for(const q of t.a[1].a)flat.push(mulS([t.a[0],q]))}
+    else flat.push(t);
+  }
+  if(P){const pt=fromPolyTerms(P);flat.splice(pos,1,...pt)}
+  if(flat.length>1&&!addS.busy){
+    const cnt=N=>N.t==='add'?N.a.length:1;
+    const expandable=T=>T.t==='mul'&&T.a.filter(f=>f.t==='add').length===1;
+    if(flat.filter(expandable).length>1){
+      const all=[];for(const T of flat){if(expandable(T)){const si=T.a.findIndex(f=>f.t==='add');const o=T.a.filter((_,k)=>k!==si);for(const q of T.a[si].a)all.push(mulS([...o,q]))}else all.push(T)}
+      addS.busy=true;let before,after;try{before=addS(flat);after=addS(all)}finally{addS.busy=false}
+      if(cnt(after)<cnt(before))return addS(all);
+    }
+    for(let i=0;i<flat.length;i++){const T=flat[i];
+      if(T.t!=='mul')continue;const si=T.a.findIndex(f=>f.t==='add');if(si<0||T.a.filter(f=>f.t==='add').length>1)continue;
+      const others=T.a.filter((_,k)=>k!==si);const ex=T.a[si].a.map(q=>mulS([...others,q]));
+      const rest=flat.filter((_,k)=>k!==i);
+      addS.busy=true;let before,after;try{before=addS(flat);after=addS([...rest,...ex])}finally{addS.busy=false}
+      if(cnt(after)<cnt(before))return addS([...rest,...ex]);
+    }
+  }
+  let c=N0;const groups=[];const idx=new Map();
+  for(const t of flat){
+    if(t.t==='num'){c=radd(c,t);continue}
+    const [k,r]=splitCoef(t);const kk=key(r);
+    if(idx.has(kk)){const g=groups[idx.get(kk)];g.k=radd(g.k,k)}else{idx.set(kk,groups.length);groups.push({k,r})}
+  }
+  const out=[];
+  for(const g of groups){if(isNum(g.k,0))continue;out.push(isNum(g.k,1)?g.r:mulS([g.k,g.r]))}
+  if(!isNum(c,0))out.push(c);
+  if(!out.length)return N0;
+  if(out.length===1)return out[0];
+  if(isNeg(out[0])){const j=out.findIndex(t=>!isNeg(t));if(j>0){const [t]=out.splice(j,1);out.unshift(t)}}
+  const cf=commonFactor(out);if(cf)return cf;
+  return add(out);
+}
+function commonFactor(terms){ // вынести общий множитель за скобки
+  if(S.depth>40)return null;
+  if(terms.every(t=>polyLike(t)))return null;
+  const facs=t=>{const [k,r]=splitCoef(t);if(!r)return [];return r.t==='mul'?r.a:[r]};
+  const bx=f=>f.t==='pow'?f.a:f, ex=f=>f.t==='pow'?f.b:N1;
+  const first=facs(terms[0]);const common=[];
+  for(const f of first){const b=bx(f);
+    if(ex(f).t!=='num'||ex(f).fl){ // eᵘ, aᵘ: показатель должен совпадать
+      if(!(f.t==='pow'&&(b.t==='c'||b.t==='num')))continue;
+      if(terms.slice(1).every(t=>facs(t).some(h=>eq(h,f))))common.push(f);
+      continue;}
+    let m=val(ex(f)),mn=ex(f),ok=true;
+    for(const t of terms.slice(1)){const g=facs(t).find(h=>eq(bx(h),b)&&ex(h).t==='num'&&!ex(h).fl);if(!g){ok=false;break}if(val(ex(g))<m){m=val(ex(g));mn=ex(g)}}
+    if(!ok)continue;
+    if(m<0&&b.t!=='add')continue;
+    if(b.t!=='add'&&b.t!=='v'&&b.t!=='fn'&&!(b.t==='c'))continue;
+    if(b.t==='c'&&m<=0)continue;
+    common.push(powS(b,mn));
+  }
+  if(!common.length)return null;
+  const inv=common.map(f=>powS(f.t==='pow'?f.a:f,mulS([NM1,f.t==='pow'?f.b:N1])));
+  S.depth=(S.depth||0)+1;
+  try{const rest=addS(terms.map(t=>mulS([t,...inv])));return mulS([...common,rest])}finally{S.depth--}
+}
+/* «приведение к общему знаменателю» для суммы с отрицательными степенями */
+function negPowers(T){ // базы с отрицательными/дробными степенями в терме
+  const fs=T.t==='mul'?T.a:[T];const r=[];
+  for(const f of fs)if(f.t==='pow'&&f.b.t==='num'&&!f.b.fl&&(val(f.b)<0||f.b.q!==1))r.push(f);
+  return r;
+}
+function together(A){
+  if(A.t!=='add')return null;
+  const need=new Map();
+  for(const T of A.a)for(const f of negPowers(T)){if(val(f.b)<0||f.b.q!==1){const k=key(f.a);const cur=need.get(k);const e=val(f.b);
+    if(e<0&&(!cur||e<cur.e))need.set(k,{b:f.a,e,ex:f.b});}}
+  if(!need.size)return null;
+  let mult=[];for(const {b,ex} of need.values())mult.push(powS(b,num(-ex.p,ex.q)));
+  const terms=A.a.map(T=>mulS([T,...mult]));
+  const numer=addS(terms);
+  const res=mulS([numer,...[...need.values()].map(o=>powS(o.b,o.ex))]);
+  return res;
+}
+function fracDepth(N){ // мера «многоэтажности»
+  if(N.t==='add')return N.a.reduce((s,t)=>s+negPowers(t).filter(f=>val(f.b)<0).length,0);
+  if(N.t==='mul')return N.a.reduce((s,f)=>s+(f.t==='add'?fracDepth(f):0),0);
+  return 0;
+}
+function rank(f){
+  if(!hasAnyVar(f))return 6;
+  const base=f.t==='pow'?f.a:f;
+  if(base.t==='v')return 1;
+  if(f.t==='pow'&&!hasAnyVar(f.a))return 2;
+  if(base.t==='fn')return 3;
+  if(base.t==='add')return 5;
+  return 4;
+}
+function hasAnyVar(N){switch(N.t){case 'v':return true;case 'num':case 'c':return false;case 'add':case 'mul':return N.a.some(hasAnyVar);case 'div':case 'pow':return hasAnyVar(N.a)||hasAnyVar(N.b);default:return hasAnyVar(N.a)}}
+function mulS(fs){
+  const flat=[];for(const f of fs){if(f.t==='mul')flat.push(...f.a);else flat.push(f)}
+  let c=N1;const groups=[];const idx=new Map();
+  for(const f of flat){
+    if(f.t==='num'){c=rmul(c,f);continue}
+    const base=f.t==='pow'?f.a:f,e=f.t==='pow'?f.b:N1;const kk=key(base);
+    if(idx.has(kk)){const g=groups[idx.get(kk)];g.e=addS([g.e,e])}else{idx.set(kk,groups.length);groups.push({b:base,e})}
+  }
+  if(isNum(c,0))return N0;
+  const out=[];
+  for(const g of groups){const p=powS(g.b,g.e);
+    if(p.t==='num'){c=rmul(c,p);continue}
+    if(p.t==='mul'){for(const q of p.a){if(q.t==='num')c=rmul(c,q);else out.push(q)}continue}
+    out.push(p)}
+  if(isNum(c,0))return N0;
+  // 2/√2 → √2,  6/√6 → √6:  целый коэффициент, кратный основанию b, «съедает» b^(−1/2)
+  if(!c.fl)for(let i=0;i<out.length;i++){const f=out[i];
+    if(f.t==='pow'&&f.a.t==='num'&&f.a.q===1&&f.a.p>1&&!f.a.fl&&f.b.t==='num'&&f.b.q===2&&f.b.p<0&&c.p%f.a.p===0){
+      c=num(c.p/f.a.p,c.q);out[i]=pow(f.a,num(f.b.p+2,2));i--}}
+  // sin w · cos⁻¹ w → tg w;  cos w · sin⁻¹ w → ctg w
+  for(let i=0;i<out.length;i++){const f=out[i];
+    if(f.t==='fn'&&(f.f==='sin'||f.f==='cos')){const other=f.f==='sin'?'cos':'sin';
+      const j=out.findIndex(g=>g.t==='pow'&&isNum(g.b,-1)&&g.a.t==='fn'&&g.a.f===other&&eq(g.a.a,f.a));
+      if(j>=0){out[i]=fn(f.f==='sin'?'tg':'ctg',f.a);out.splice(j,1);i=-1}}}
+  // tgᵃ w при наличии cos w → sinᵃ w · cos⁻ᵃ w  (аналогично ctg с sin)
+  {const base=g=>g.t==='pow'?g.a:g, ex=g=>g.t==='pow'?g.b:N1;
+   for(let i=0;i<out.length;i++){const f=base(out[i]);
+    if(f.t==='fn'&&(f.f==='tg'||f.f==='ctg')&&isInt(ex(out[i]))){const a=ex(out[i]).p;const other=f.f==='tg'?'cos':'sin';
+      const j=out.findIndex(g=>{const h=base(g);return h.t==='fn'&&h.f===other&&eq(h.a,f.a)&&isInt(ex(g))&&Math.sign(ex(g).p)===Math.sign(a)});
+      if(j>=0){const rest=out.filter((_,k)=>k!==i);return mulS([c,...rest,powS(fn(f.f==='tg'?'sin':'cos',f.a),num(a)),powS(fn(other,f.a),num(-a))])}}}}
+  // 2 sin w cos w → sin 2w
+  {const si=out.findIndex(f=>(f.t==='fn'&&f.f==='sin')||(f.t==='pow'&&isNum(f.b,-1)&&f.a.t==='fn'&&f.a.f==='sin'));
+   if(si>=0){const sf=out[si],w=(sf.t==='fn'?sf:sf.a).a,e=sf.t==='fn'?1:-1;
+     const ci=out.findIndex(f=>e===1?(f.t==='fn'&&f.f==='cos'&&eq(f.a,w)):(f.t==='pow'&&isNum(f.b,-1)&&f.a.t==='fn'&&f.a.f==='cos'&&eq(f.a.a,w)));
+     if(ci>=0&&!c.fl&&(e===1?c.p%2===0:c.q%2===0)){const w2=mulS([num(2),w]);const nf=e===1?fn('sin',w2):pow(fn('sin',w2),NM1);
+       const rest=out.filter((_,k)=>k!==si&&k!==ci);return mulS([e===1?num(c.p/2,c.q):num(c.p*2,c.q),nf,...rest])}}}
+  // общий рациональный множитель суммы: (x/2 − 1/2) → (x − 1)/2
+  for(let i=0;i<out.length;i++){const f=out[i];if(f.t==='add'){
+    let L=1;for(const T of f.a){const [k]=splitCoef(T);if(!k.fl)L=L*k.q/gcd(L,k.q)}
+    if(L>1&&L<1e6){out[i]=addS(f.a.map(T=>mulS([num(L),T])));return mulS([num(c.p,c.q*L),...out])}}}
+  // Fᵉ · Bᵏ, где в сумме F есть B в отрицательной степени → (F·B^(k/e))ᵉ, e = ±1
+  for(let i=0;i<out.length;i++){const f0=out[i];
+    const e=f0.t==='add'?1:(f0.t==='pow'&&f0.a.t==='add'&&isNum(f0.b,-1)?-1:0);if(!e)continue;
+    const f=e===1?f0:f0.a;if(fracDepth(f)===0)continue;
+    for(let j=0;j<out.length;j++){if(j===i)continue;const g=out[j];
+      const gb=g.t==='pow'?g.a:g,ge=g.t==='pow'?g.b:N1;if(ge.t!=='num'||ge.fl||Math.sign(val(ge))!==e)continue;
+      const hit=f.a.some(T=>negPowers(T).some(h=>eq(h.a,gb)&&val(h.b)<0));if(!hit)continue;
+      const mf=e===1?g:powS(gb,num(-ge.p,ge.q));
+      const nf=addS(f.a.map(T=>mulS([T,mf])));
+      if(fracDepth(nf)<fracDepth(f)){const rest=out.filter((_,k)=>k!==i&&k!==j);return mulS([c,...rest,e===1?nf:powS(nf,NM1)])}}}
+  // (1 − sin w)(1 + sin w) → cos²w,  (1 − cos w)(1 + cos w) → sin²w
+  {const base=g=>g.t==='pow'?g.a:g, ex=g=>g.t==='pow'?g.b:N1;
+   const trig=A=>{if(A.t!=='add'||A.a.length!==2)return null;const one=A.a.findIndex(t=>isNum(t,1));if(one<0)return null;const o=A.a[1-one];
+     const [k,r]=splitCoef(o);if(!(isNum(k,1)||isNum(k,-1))||!r||r.t!=='fn'||(r.f!=='sin'&&r.f!=='cos'))return null;return {f:r.f,w:r.a,s:val(k)}};
+   for(let i=0;i<out.length;i++){const a=trig(base(out[i]));if(!a)continue;
+     for(let j=i+1;j<out.length;j++){const b=trig(base(out[j]));
+       if(b&&b.f===a.f&&b.s===-a.s&&eq(a.w,b.w)&&eq(ex(out[i]),ex(out[j]))){
+         const rest=out.filter((_,k)=>k!==i&&k!==j);return mulS([c,...rest,powS(fn(a.f==='sin'?'cos':'sin',a.w),mulS([num(2),ex(out[i])]))])}}}}
+  // общий целый множитель суммы и знак: (2x² + 2) → 2(x² + 1);  (−x − 1) → −(x + 1)
+  for(let i=0;i<out.length;i++){const f0=out[i];const f=f0.t==='pow'?f0.a:f0,e=f0.t==='pow'?f0.b:N1;
+    if(f.t!=='add'||!isInt(e))continue;
+    const ks=f.a.map(T=>splitCoef(T)[0]);if(ks.some(k=>k.fl||k.q!==1))continue;
+    let g=0;for(const k of ks)g=gcd(g,k.p);const allNeg=ks.every(k=>k.p<0);
+    if(g>1||allNeg){const m=allNeg?-g:g;out[i]=powS(addS(f.a.map(T=>mulS([num(1,m),T]))),e);
+      const cm=rpow(num(m),e.p);if(!cm)continue;return mulS([rmul(c,cm),...out])}}
+  // дробь в числителе дроби → к общему знаменателю
+  const hasDen=out.some(f=>f.t==='pow'&&f.b.t==='num'&&val(f.b)<0);
+  if(hasDen&&!S.noTogether){
+    for(let i=0;i<out.length;i++){const f=out[i];if(f.t==='add'&&fracDepth(f)>0){
+      S.noTogether=true;let tg;try{tg=together(f)}finally{S.noTogether=false}
+      if(tg&&fracDepth(tg)<fracDepth(f)){out.splice(i,1);return mulS([c,...out,tg])}}}
+  }
+  const ranked=out.map((f,i)=>({f,i,r:rank(f)})).sort((a,b)=>a.r-b.r||a.i-b.i).map(o=>o.f);
+  if(!ranked.length)return c;
+  if(isNum(c,1))return ranked.length===1?ranked[0]:mul(ranked);
+  return mul([c,...ranked]);
+}
+function posDef(a){ // заведомо положительное выражение
+  if(a.t==='num')return val(a)>0;if(a.t==='c')return true;
+  if(a.t==='pow'&&a.a.t==='c')return true;
+  if(a.t==='pow'&&isInt(a.b)&&a.b.p%2===0)return true;
+  if(a.t==='pow'&&a.b.t==='num'&&!a.b.fl&&a.b.q%2===0)return true;
+  if(a.t==='fn'&&(a.f==='ch'||a.f==='abs'))return true;
+  if(a.t==='add')return a.a.every(posDef);
+  if(a.t==='mul')return a.a.every(posDef);
+  return false;
+}
+function powS(A,B){
+  if(isNum(B,0))return N1;
+  if(isNum(B,1))return A;
+  if(isNum(A,1))return N1;
+  if(isNum(A,0)&&B.t==='num'&&val(B)>0)return N0;
+  if(A.t==='num'&&!A.fl&&B.t==='num'&&!B.fl){
+    if(B.q===1&&Math.abs(B.p)<=30){const r=rpow(A,B.p);if(r)return r}
+    if(B.q>1&&B.q<=6){const rp=iroot(A.p,B.q),rq=iroot(A.q,B.q);if(rp!==null&&rq!==null){const r=rpow(num(rp,rq),B.p);if(r)return r}}
+  }
+  if(A.t==='fn'&&A.f==='abs'&&isInt(B)&&B.p%2===0)return powS(A.a,B); // |u|² = u²
+  if(A.t==='pow'){
+    if(B.t==='num'&&A.b.t==='num'){const e=rmul(A.b,B);
+      // (u²)^(1/2) = |u|, (u²)^(3/2) = |u|³ — модуль нужен, если чётная степень «снимается» до нечётной/дробной
+      if(isInt(A.b)&&A.b.p%2===0&&!(isInt(e)&&e.p%2===0)&&hasAnyVar(A.a)&&!posDef(A.a)&&!(A.a.t==='fn'&&A.a.f==='abs'))return powS(fn('abs',A.a),e);
+      return powS(A.a,e)}
+    if(isInt(B)||!hasAnyVar(A.a)||(A.a.t==='c'))return powS(A.a,mulS([A.b,B]));
+  }
+  if(A.t==='mul'&&isInt(B))return mulS(A.a.map(f=>powS(f,B)));
+  if(A.t==='mul'&&B.t==='num'&&A.a[0].t==='num'&&val(A.a[0])>0){ // (4x)^(1/2) → 2√x, если корень извлекается
+    const c=powS(A.a[0],B);if(c.t==='num'){const rest=A.a.slice(1);return mulS([c,powS(rest.length===1?rest[0]:mul(rest),B)])}
+  }
+  if(A.t==='c'&&A.n==='e'&&B.t==='fn'&&B.f==='ln')return B.a;
+  if(A.t==='c'&&A.n==='e'&&B.t==='mul'&&B.a.length===2&&B.a[0].t==='num'&&B.a[1].t==='fn'&&B.a[1].f==='ln')return powS(B.a[1].a,B.a[0]);
+  if(A.t==='c'&&A.n==='e'&&B.t==='add'&&B.a.some(t=>(t.t==='fn'&&t.f==='ln')||(t.t==='mul'&&t.a.length===2&&t.a[0].t==='num'&&t.a[1].t==='fn'&&t.a[1].f==='ln'))){
+    const lg=t=>(t.t==='fn'&&t.f==='ln')||(t.t==='mul'&&t.a.length===2&&t.a[0].t==='num'&&t.a[1].t==='fn'&&t.a[1].f==='ln');
+    const L=B.a.filter(lg),O=B.a.filter(t=>!lg(t));return mulS([...L.map(t=>powS(A,t)),...(O.length?[powS(A,O.length===1?O[0]:add(O))]:[])]);
+  }
+  return pow(A,B);
+}
+function fnS(f,a){
+  if(a.t==='num'&&!a.fl){const v=val(a);
+    if(v===0&&['sin','tg','arcsin','arctg','sh','th'].includes(f))return N0;
+    if(v===0&&['cos','ch'].includes(f))return N1;
+    if(v===1&&['ln','lg'].includes(f))return N0;
+    if(v===10&&f==='lg')return N1;
+    if(f==='abs')return num(Math.abs(a.p),a.q);
+  }
+  if(f==='ln'&&a.t==='c'&&a.n==='e')return N1;
+  if(f==='ln'&&a.t==='pow'&&a.a.t==='c'&&a.a.n==='e')return a.b;
+  if(f==='abs'&&!hasAnyVar(a)){const v=ev(a,{});if(Number.isFinite(v))return v>=0?a:mulS([NM1,a])}
+  const ex=exactFn(f,a);if(ex)return ex;
+  if(f==='abs'&&a.t==='pow'&&isInt(a.b)&&a.b.p%2===0)return a;
+  return fn(f,a);
+}
+/* точные значения тригонометрии и обратных функций в «хороших» точках */
+const SQ2H=()=>mul([HALF,pow(num(2),HALF)]),SQ3H=()=>mul([HALF,pow(num(3),HALF)]),SQ3=()=>pow(num(3),HALF),SQ3T=()=>mul([num(1,3),pow(num(3),HALF)]);
+const SIN15={0:()=>N0,2:()=>HALF,3:SQ2H,4:SQ3H,6:()=>N1}; // угол в единицах 15°
+function sinExact(k){k=((k%24)+24)%24;let sg=1;if(k>12){k-=12;sg=-1}if(k>6)k=12-k;const f=SIN15[k];if(!f)return null;const r=f();return sg<0?mulS([NM1,r]):r}
+const PI_K=(p,q)=>mulS([num(p,q),C('pi')]);
+function exactFn(f,a){
+  if(hasAnyVar(a))return null;
+  const v=ev(a,{});if(!Number.isFinite(v))return null;
+  if(['sin','cos','tg','ctg'].includes(f)){
+    const m=v/Math.PI*12;if(Math.abs(m-Math.round(m))>1e-9)return null;const k=Math.round(m);
+    if(!(k%2===0||k%3===0))return null;
+    const s1=sinExact(k),c1=sinExact(k+6);if(!s1||!c1)return null;
+    if(f==='sin')return s1;if(f==='cos')return c1;
+    const sv=ev(s1,{}),cv=ev(c1,{});
+    if(f==='tg'){if(Math.abs(cv)<1e-12)return null;return S(div(s1,c1))}
+    if(Math.abs(sv)<1e-12)return null;return S(div(c1,s1));
+  }
+  const TBL={arcsin:[[0,0,1],[0.5,1,6],[Math.SQRT1_2,1,4],[Math.sqrt(3)/2,1,3],[1,1,2]],
+             arctg:[[0,0,1],[1/Math.sqrt(3),1,6],[1,1,4],[Math.sqrt(3),1,3]]};
+  if(f==='arcsin'||f==='arctg'){for(const [x,p,q] of TBL[f]){if(Math.abs(Math.abs(v)-x)<1e-12)return p===0?N0:PI_K(v<0?-p:p,q)}return null}
+  if(f==='arccos'){const r=exactFn('arcsin',a);return r?S(add([PI_K(1,2),neg(r)])):null}
+  if(f==='arcctg'){const r=exactFn('arctg',a);return r?S(add([PI_K(1,2),neg(r)])):null}
+  return null;
+}
+function deriv(N,x='x'){let r=S(d(N,x));for(let i=0;i<3;i++){const r2=S(r);if(key(r2)===key(r))break;r=r2}return r}
+
+/* ---------- вывод ---------- */
+const FNAME={sin:'sin',cos:'cos',tg:'tg',ctg:'ctg',arcsin:'arcsin',arccos:'arccos',arctg:'arctg',arcctg:'arcctg',ln:'ln',lg:'lg',sh:'sh',ch:'ch',th:'th',cth:'cth'};
+function isNeg(N){
+  if(N.t==='num')return val(N)<0;
+  if(N.t==='neg')return true;
+  if(N.t==='mul')return N.a.length>0&&isNeg(N.a[0]);
+  if(N.t==='div')return isNeg(N.a);
+  return false;
+}
+function negate(N){ // снять минус
+  if(N.t==='num')return num(-N.p,N.q);
+  if(N.t==='neg')return N.a;
+  if(N.t==='mul'){const f=negate(N.a[0]);if(isNum(f,1))return N.a.length===2?N.a[1]:mul(N.a.slice(1));return mul([f,...N.a.slice(1)])}
+  if(N.t==='div')return div(negate(N.a),N.b);
+  return neg(N);
+}
+const VNAME={x:'x',y:'y',t:'t',u:'u',v:'v',w:'w',s:'s',p:'p',q:'q',z:'z',g:'g',r:'r'};
+function R(N,mode='html'){return new Renderer(mode).r(N)}
+// есть ли в тексте операция из ops вне скобок (кроме ведущего минуса)
+function topOp(s,ops){let d=0,ab=0;for(let i=0;i<s.length;i++){const c=s[i];
+  if(c==='|'){if(ab>0&&i>0&&!'+-*/^( |'.includes(s[i-1])){ab--;d--}else{ab++;d++}}
+  else if(c==='(')d++;else if(c===')')d--;else if(d===0&&i>0&&ops.includes(c))return true}return false}
+class Renderer{
+  constructor(mode){this.h=mode==='html'}
+  minus(){return this.h?'−':'-'}
+  frac(a,b){return this.h?`<span class="fr"><span>${a}</span><span>${b}</span></span>`:`${this.wrapT(a)}/${this.wrapT(b)}`}
+  wrapT(s){return /^[0-9a-z.]+$/i.test(s)?s:'('+s+')'}
+  sup(s){return this.h?`<sup>${s}</sup>`:''}
+  r(N){
+    switch(N.t){
+      case 'num':return this.num(N);
+      case 'v':return VNAME[N.n]||N.n;
+      case 'c':return N.n==='e'?'e':(this.h?'π':'pi');
+      case 'add':return this.add(N.a);
+      case 'neg':return this.minus()+this.paren(N.a,'neg');
+      case 'mul':return this.mul(N);
+      case 'div':{const a=this.r(N.a),b=this.r(N.b);return this.h?this.frac(a,b):`${this.par(N.a,'divn')}/${this.par(N.b,'divd')}`}
+      case 'pow':return this.pow(N);
+      case 'fn':return this.fn(N);
+    }
+  }
+  num(N){
+    if(N.fl){const s=String(+N.p.toPrecision(8));return this.h?s.replace('-','−').replace('.',','):s}
+    if(N.q===1)return this.h?String(N.p).replace('-','−'):String(N.p);
+    if(this.h){const s=this.frac(Math.abs(N.p),N.q);return N.p<0?'−'+s:s}
+    return `${N.p}/${N.q}`;
+  }
+  par(N,ctx){ // нужны ли скобки (текстовый режим)
+    const s=this.r(N);
+    const needs=(N.t==='add')||(N.t==='neg')||(isNeg(N))||
+      (ctx==='divd'&&(N.t==='mul'||N.t==='div'))||(ctx==='divn'&&N.t==='div')||
+      ((ctx==='divn'||ctx==='divd')&&N.t==='num'&&N.q!==1);
+    return needs||topOp(s,ctx==='divd'?'+-*/ ':'+ ')?'('+s+')':s;
+  }
+  paren(N,ctx){const s=this.r(N);return (N.t==='add'||(ctx==='neg'&&isNeg(N)))?'('+s+')':s}
+  add(terms){
+    let s='';terms.forEach((t,i)=>{
+      if(i===0){s+=this.r(t);return}
+      if(isNeg(t))s+=` ${this.minus()} `+this.paren(negate(t),'term');
+      else s+=' + '+this.r(t);
+    });return s;
+  }
+  mul(N){
+    let fs=N.a.slice();let sign='';
+    let c=null;
+    if(fs[0].t==='num'){c=fs[0];fs=fs.slice(1)}
+    if(c&&val(c)<0){sign=this.minus();c=num(-c.p,c.q)}
+    const top=[],bot=[];
+    if(c&&!isNum(c,1)){if(c.fl)top.push(c);else{if(c.p!==1)top.push(num(c.p));if(c.q!==1)bot.push(num(c.q))}}
+    for(const f of fs){
+      if(f.t==='pow'&&f.b.t==='num'&&val(f.b)<0){const e=num(-f.b.p,f.b.q);bot.push(isNum(e,1)?f.a:pow(f.a,e))}
+      else top.push(f);
+    }
+    {const rad=g=>g.t==='pow'&&g.a.t==='num'&&g.b.t==='num'&&g.b.q!==1?1:0;const r1=top.filter(rad);if(r1.length&&r1.length<top.length){const r0=top.filter(g=>!rad(g));top.length=0;top.push(...r1,...r0)}} // √2·x, а не x·√2
+    if(!bot.length){const body=this.prod(top);return sign&&top.length===1&&(top[0].t==='add')?sign+'('+body+')':sign+body}
+    const a=top.length?this.prod(top):'1',b=this.prod(bot);
+    if(this.h)return sign+this.frac(a,b);
+    const ta=top.length>1||(top.length===1&&(top[0].t==='add'||top[0].t==='div'||top[0].t==='mul'))||topOp(a,'+ ')?'('+a+')':a;
+    const tb=bot.length>1||(bot.length===1&&(bot[0].t==='add'||bot[0].t==='div'||bot[0].t==='mul'||(bot[0].t==='num'&&bot[0].q!==1)))||topOp(b,'+-*/ ')?'('+b+')':b;
+    return sign+ta+'/'+tb;
+  }
+  prod(fs){
+    if(!fs.length)return '1';
+    let s='';
+    fs.forEach((f,i)=>{
+      let piece=this.r(f);
+      const wrap=(f.t==='add'&&fs.length>1)||(i>0&&isNeg(f))||f.t==='neg';
+      if(wrap)piece='('+piece+')';
+      if(i===0){s=piece;return}
+      const prev=fs[i-1];
+      if(!this.h){s+='*'+piece;return}
+      const prevNum=prev.t==='num';
+      if(prevNum&&!/^[0-9−(]/.test(piece)&&!(f.t==='div'))s+=piece;
+      else if(f.t==='add'&&wrap&&!prevNum&&prev.t!=='add')s+=piece;
+      else s+='·'+piece;
+    });
+    return s;
+  }
+  atomic(N){return N.t==='v'||N.t==='c'||(N.t==='num'&&N.q===1&&N.p>=0&&!N.fl)||(N.t==='fn'&&N.f==='abs')}
+  pow(N){
+    const A=N.a,B=N.b;
+    if(B.t==='num'&&val(B)<0)return this.mul(mul([N]));
+    if(B.t==='num'&&!B.fl&&B.p===1&&(B.q===2||B.q===3)){
+      const inner=this.r(A);
+      if(this.h)return `<span class="rad">${B.q===2?'√':'∛'}<span class="ov">${inner}</span></span>`;
+      return B.q===2?`sqrt(${inner})`:`(${inner})^(1/3)`;
+    }
+    if(A.t==='fn'&&A.f!=='abs'&&isInt(B)&&B.p>0){
+      const arg=this.fnArg(A.a);
+      return this.h?`${FNAME[A.f]}${this.sup(B.p)}${arg}`:`${FNAME[A.f]}(${this.r(A.a)})^${B.p}`;
+    }
+    let base=this.r(A);
+    if(!this.atomic(A))base='('+base+')';
+    if(this.h){
+      let ex=this.r(B);
+      if(B.t==='num'&&B.q!==1&&!B.fl)ex=`${B.p}/${B.q}`;
+      return base+this.sup(ex);
+    }
+    const e=this.r(B);
+    return base+'^'+(/^[0-9a-z]+$/i.test(e)?e:'('+e+')');
+  }
+  fnArg(a){
+    if(!this.h)return '('+this.r(a)+')';
+    if(a.t==='v'||(a.t==='mul'&&a.a.length===2&&a.a[0].t==='num'&&a.a[0].q===1&&a.a[0].p>0&&a.a[1].t==='v'))return ' '+this.r(a);
+    return '('+this.r(a)+')';
+  }
+  fn(N){
+    if(N.f==='abs')return '|'+this.r(N.a)+'|';
+    if(!this.h)return `${FNAME[N.f]}(${this.r(N.a)})`;
+    return FNAME[N.f]+this.fnArg(N.a);
+  }
+}
+
+/* ---------- пошаговое объяснение ---------- */
+const LETTERS=['u','v','w','s','p','q','z'];
+const pr=N=>`(${R(N)})′`;
+function isTable(N){
+  if(N.t==='v'&&N.n==='x')return true;
+  if(N.t==='fn'&&N.a.t==='v'&&N.a.n==='x')return true;
+  if(N.t==='pow'&&N.a.t==='v'&&N.a.n==='x'&&!has(N.b))return true;
+  if(N.t==='pow'&&!has(N.a)&&N.b.t==='v'&&N.b.n==='x')return true;
+  return false;
+}
+function constSplit(N){ // N = C · R
+  if(N.t==='neg'){const [c,r]=constSplit(N.a);return [mul([NM1,c]),r]}
+  if(N.t==='mul'){const c=N.a.filter(f=>!has(f)),r=N.a.filter(f=>has(f));if(c.length&&r.length)return [c.length===1?c[0]:mul(c),r.length===1?r[0]:mul(r)]}
+  if(N.t==='div'&&!has(N.b)){const [c,r]=constSplit(N.a);return [div(c,N.b),r]}
+  return [N1,N];
+}
+function isUnary(N){return has(N)&&(N.t==='fn'||(N.t==='pow'&&(!has(N.b)||!has(N.a))))}
+function innerOf(N){return N.t==='fn'?N.a:(has(N.a)?N.a:N.b)}
+function withInner(N,w){if(N.t==='fn')return fn(N.f,w);return has(N.a)?pow(w,N.b):pow(N.a,w)}
+function simpleLine(N,res,note){return {text:`${pr(N)} = ${R(res)}${note?` <span class="why">${note}</span>`:''}`}}
+function outerName(N){
+  if(N.t==='fn')return {sin:'синус',cos:'косинус',tg:'тангенс',ctg:'котангенс',arcsin:'арксинус',arccos:'арккосинус',arctg:'арктангенс',arcctg:'арккотангенс',ln:'логарифм',lg:'десятичный логарифм',sh:'гиперболический синус',ch:'гиперболический косинус',th:'гиперболический тангенс',cth:'гиперболический котангенс',abs:'модуль'}[N.f];
+  if(N.t==='pow'&&has(N.a)){const b=N.b;if(isNum(b,0.5))return 'квадратный корень';if(b.t==='num'&&b.p===1&&b.q===3)return 'кубический корень';if(b.t==='num'&&val(b)<0)return 'степень с отрицательным показателем';return 'степень'}
+  if(N.t==='pow')return 'показательная функция';
+  return 'функция';
+}
+function fin(lab,asm,res){ // «Подставляем … Упрощаем …» без повторов
+  const a=R(asm),b=R(res);
+  if(a===b)return [{text:`Подставляем: <b>${lab} = ${b}</b>`}];
+  return [{text:`Подставляем: ${lab} = ${a}`},{text:`Упрощаем: <b>${lab} = ${b}</b>`}];
+}
+function explain(N,lvl=0,top='y′'){
+  const res=deriv(N);
+  const lab=lvl===0?top:pr(N);
+  if(!has(N))return {d:N0,items:[{text:`${pr(N)} = 0 <span class="why">производная константы</span>`}],trivial:true};
+  if(isTable(N))return {d:res,items:[simpleLine(N,res,'по таблице')],trivial:true};
+  const [c,r]=constSplit(N);
+  if(!isNum(c,1)){
+    const cs=S(c);
+    if(isTable(r)||(r.t==='v'))return {d:res,items:[{text:`${pr(N)} = ${R(cs)}·${pr(r)} = ${R(res)} <span class="why">константу выносим, дальше по таблице</span>`}],trivial:true};
+    const sub=explain(r,lvl+1);
+    const isM1=isNum(cs,-1);
+    return {d:res,items:[
+      {text:isM1?`Минус выносим за знак производной: ${pr(N)} = −${pr(r)}.`:`Постоянный множитель ${R(cs)} выносим за знак производной: ${pr(N)} = ${R(cs)}·${pr(r)}.`},
+      ...(sub.trivial?[{text:`${pr(r)} = ${R(sub.d)}`}]:[{text:`Находим ${pr(r)}:`,sub:sub.items}]),
+      {text:`Итого: <b>${lab} = ${isM1?'−('+R(sub.d)+')':R(cs)+'·('+R(sub.d)+')'} = ${R(res)}</b>`}]};
+  }
+  if(N.t==='add'){
+    const parts=N.a.map(t=>({t,e:explain(t,lvl+1)}));
+    if(parts.every(p=>p.e.trivial)){
+      const ds=parts.map(p=>p.e.d);
+      const midS=R(add(ds));const mid=(ds.length>1&&midS!==R(res))?' = '+midS:'';
+      const line=`${pr(N)}${mid} = ${R(res)}`;
+      if(lvl>0)return {d:res,items:[{text:line+' <span class="why">почленно по таблице</span>'}],trivial:true};
+      return {d:res,items:[{text:'Производная суммы равна сумме производных — берём каждое слагаемое по таблице:'},{text:`${pr(N)}${mid} = <b>${R(res)}</b>`}]};
+    }
+    const items=[{text:'Производная суммы (разности) равна сумме (разности) производных — берём каждое слагаемое отдельно:'}];
+    for(const p of parts){if(!has(p.t))continue;
+      if(p.e.trivial)items.push({text:p.e.items[0].text});
+      else items.push({text:`${pr(p.t)}:`,sub:p.e.items});}
+    items.push({text:`Складываем: <b>${lab} = ${R(res)}</b>`});
+    return {d:res,items};
+  }
+  if(N.t==='mul'){
+    const fs=N.a;const u=fs[0],v=fs.length===2?fs[1]:mul(fs.slice(1));
+    const eu=explain(u,lvl+1),evv=explain(v,lvl+1);
+    const asm=add([mul([eu.d,v]),mul([u,evv.d])]);
+    return {d:res,items:[
+      {text:`Производная произведения: (u·v)′ = u′·v + u·v′, где u = ${R(u)}, v = ${R(v)}.`},
+      eu.trivial?{text:`u′ = ${R(eu.d)}`}:{text:`u′ = ${pr(u)}:`,sub:eu.items},
+      evv.trivial?{text:`v′ = ${R(evv.d)}`}:{text:`v′ = ${pr(v)}:`,sub:evv.items},
+      ...fin(lab,asm,res)]};
+  }
+  if(N.t==='div'){
+    const u=N.a,v=N.b;
+    if(!has(u)){
+      const ev2=explain(v,lvl+1);
+      return {d:res,items:[
+        {text:`Числитель — константа, поэтому удобно (C/v)′ = −C·v′/v², где C = ${R(u)}, v = ${R(v)}.`},
+        ev2.trivial?{text:`v′ = ${R(ev2.d)}`}:{text:`v′ = ${pr(v)}:`,sub:ev2.items},
+        ...fin(lab,neg(div(mul([u,ev2.d]),pow(v,num(2)))),res)]};
+    }
+    const eu=explain(u,lvl+1),evv=explain(v,lvl+1);
+    const asm=div(add([mul([eu.d,v]),neg(mul([u,evv.d]))]),pow(v,num(2)));
+    return {d:res,items:[
+      {text:`Производная частного: (u/v)′ = (u′v − uv′)/v², где u = ${R(u)}, v = ${R(v)}.`},
+      eu.trivial?{text:`u′ = ${R(eu.d)}`}:{text:`u′ = ${pr(u)}:`,sub:eu.items},
+      evv.trivial?{text:`v′ = ${R(evv.d)}`}:{text:`v′ = ${pr(v)}:`,sub:evv.items},
+      ...fin(lab,asm,res)]};
+  }
+  if(N.t==='pow'&&has(N.a)&&has(N.b)){
+    const u=N.a,v=N.b;const L=mul([v,fn('ln',u)]);const eL=explain(L,lvl+1);
+    return {d:res,items:[
+      {text:`Степенно-показательная функция u<sup>v</sup> (x и в основании, и в показателе) — логарифмируем: ln y = ${R(L)}.`},
+      {text:`Дифференцируем обе части, слева (ln y)′ = y′/y:`,sub:[{text:`${pr(L)}:`,sub:eL.items}]},
+      {text:`${lab} = y·(${R(eL.d)}) = ${R(N)}·(${R(eL.d)})`},
+      {text:`Ответ: <b>${lab} = ${R(res)}</b>`}]};
+  }
+  if(isUnary(N)){
+    const layers=[];let cur=N;
+    while(isUnary(cur)&&!(cur.t==='pow'&&has(cur.a)&&has(cur.b))){layers.push(cur);const w=innerOf(cur);if(w.t==='v')break;cur=w}
+    const last=layers[layers.length-1];const core=innerOf(last);
+    const coreIsX=core.t==='v';
+    const names=lvl===0?['y',...LETTERS]:['g','t','s','r','p','q','z'];
+    const items=[];
+    items.push({text:`Сложная функция — раскладываем на звенья снаружи внутрь (внешняя: ${outerName(N)}):`,
+      sub:layers.map((L,i)=>({text:`${names[i]} = ${R(withInner(L,V(i===layers.length-1&&coreIsX?'x':names[i+1])))}`})).concat(coreIsX?[]:[{text:`${names[layers.length]} = ${R(core)}`}])});
+    const dph=[],dreal=[];
+    const dlines=[];
+    layers.forEach((L,i)=>{
+      const nm=(i===layers.length-1&&coreIsX)?'x':names[i+1];
+      const ph=withInner(L,V(nm));const dd=S(d(ph,nm));
+      dph.push(dd);dreal.push(S(subst(dd,nm,innerOf(L))));
+      dlines.push({text:`(${R(ph)})′<sub>${nm}</sub> = ${R(dd)}`});
+    });
+    let ec=null;
+    if(!coreIsX){ec=explain(core,lvl+1);
+      if(ec.trivial)dlines.push({text:ec.items[0].text});else dlines.push({text:`${pr(core)}:`,sub:ec.items});}
+    items.push({text:'Берём производную каждого звена по его аргументу:',sub:dlines});
+    const chainPh=mul([...dph,...(ec?[ec.d]:[])]);
+    items.push({text:`Перемножаем (цепное правило): ${lab} = ${dph.map(z=>'('+R(z)+')').join('·')}${ec?'·('+R(ec.d)+')':''}`});
+    if(layers.length>1||!coreIsX)items.push({text:`Возвращаем x: ${lab} = ${[...dreal,...(ec?[ec.d]:[])].map(z=>'('+R(z)+')').join('·')}`});
+    items.push({text:`Упрощаем: <b>${lab} = ${R(res)}</b>`});
+    return {d:res,items};
+  }
+  return {d:res,items:[simpleLine(N,res)]};
+}
+function itemsHTML(items){return '<ol>'+items.map(it=>`<li>${it.text}${it.sub?itemsHTML(it.sub):''}</li>`).join('')+'</ol>'}
+
+/* ---------- проверка ответов ---------- */
+const PTS=[0.37,0.61,0.83,1.27,1.9,2.6,-0.45,-1.3,0.2,0.53,1.13,-0.77,3.1,-2.2,0.07,-0.13,0.29,0.17,-0.23,0.11];
+function sameFn(A,B,vars=['x']){
+  let n=0;
+  for(let i=0;i<PTS.length;i++){
+    const env={};vars.forEach((v,k)=>env[v]=PTS[(i+5*k)%PTS.length]+(k?0.31*k:0));
+    const e=ev(B,env);if(!Number.isFinite(e))continue;
+    const u=ev(A,env);
+    if(!Number.isFinite(u)||Math.abs(u-e)>1e-6*Math.max(1,Math.abs(e)))return false;
+    n++;
+  }
+  return n>=3;
+}
+function finiteCount(N,vars=['x']){let n=0;for(let i=0;i<PTS.length;i++){const env={};vars.forEach((v,k)=>env[v]=PTS[(i+5*k)%PTS.length]+(k?0.31*k:0));if(Number.isFinite(ev(N,env)))n++}return n}
+
+return {parse,deriv,d,S,R,ev,has,subst,explain,itemsHTML,sameFn,finiteCount,num,V,X,C,add,mul,div,pow,neg,fn,key,eq,
+  _:{isNum,val,isInt,toPoly,fromPolyTerms,together,tidy,isNeg,negate,mulS,addS,powS,fnS,hasAnyVar,N0,N1,NM1,HALF,pAdd,pMul,rmul,radd,gcd}};
+})();
+if(typeof module!=='undefined')module.exports=DX;
+
+</script>
+<script>
+/* ===================== Движок пределов =====================
+   Структурное вычисление предела снизу вверх. Где возникает неопределённость — подбирается метод:
+   разложение на множители, старшая степень, сопряжённое, эквивалентности, 1^∞ / e^{…}, Лопиталь.
+   Каждый шаг записывается в объяснение. В конце — численная перепроверка. */
+const LIM=(function(){
+'use strict';
+const {parse,S,R,ev,has,subst,deriv,num,V,X,C,add,mul,div,pow,neg,fn,key,eq,itemsHTML}=DX;
+const {isNum,val,isInt,toPoly,fromPolyTerms,together,tidy,hasAnyVar,N0,N1,NM1,HALF,mulS,addS,powS,pAdd,pMul,rmul,radd}=DX._;
+
+/* ---------- значения пределов ---------- */
+function FIN(N){N=S(N);const v=ev(N,{});if(Math.abs(v)<1e-13&&!isNum(N,0))N=N0;return {k:'fin',N,v:Math.abs(v)<1e-13?0:v}}
+const PINF={k:'pinf'},MINF={k:'minf'},BND={k:'bnd'},NONE={k:'none'},FAIL={k:'fail'};
+const isZero=L=>L.k==='fin'&&Math.abs(L.v)<1e-12;
+const isInf=L=>L.k==='pinf'||L.k==='minf';
+const sgnL=L=>L.k==='pinf'?1:L.k==='minf'?-1:Math.sign(L.v);
+const infOf=s=>s>0?PINF:MINF;
+const negL=L=>L.k==='fin'?FIN(mulS([NM1,L.N])):L.k==='pinf'?MINF:L.k==='minf'?PINF:L;
+const bad=L=>L.k==='none'||L.k==='fail';
+function LH(L){return L.k==='fin'?R(L.N):L.k==='pinf'?'+∞':L.k==='minf'?'−∞':L.k==='bnd'?'не существует (колеблется)':L.k==='none'?'не существует':'?'}
+
+/* ---------- контекст ---------- */
+function mk(a,s,opt={}){return {a,s,steps:[],silent:!!opt.silent,depth:opt.depth||0,show:opt.show||'',lh:0,budget:opt.budget||{n:0}}}
+function child(ctx,silent){const c=mk(ctx.a,ctx.s,{silent:silent||ctx.silent,depth:ctx.depth+1,show:ctx.show,budget:ctx.budget});c.lh=ctx.lh;return c}
+function push(ctx,text,sub){if(!ctx.silent)ctx.steps.push(sub&&sub.length?{text,sub}:{text})}
+function aH(ctx){const a=ctx.a;if(a.k==='pinf')return ctx.show==='inf'?'∞':'+∞';if(a.k==='minf')return '−∞';return R(a.N)+(ctx.show==='side'?(ctx.s>0?'+0':'−0'):'')}
+function LIMH(N,ctx){const e=R(N);return `<span class="lim">lim<sub>x→${aH(ctx)}</sub></span>${N.t==='add'?'('+e+')':e}`}
+
+/* ---------- численные помощники ---------- */
+function pts(ctx){
+  if(ctx.a.k==='fin')return [1e-3,1e-4,1e-5,1e-6,1e-7].map(h=>ctx.a.v+ctx.s*h*Math.max(1,Math.abs(ctx.a.v)));
+  const sg=ctx.a.k==='pinf'?1:-1;return [1e2,1e3,1e4,1e5,1e6].map(x=>sg*x);
+}
+function sign0(N,ctx){
+  const xs=pts(ctx);let last=0,prev=0;
+  for(const x of xs){const v=ev(N,x);if(!Number.isFinite(v)&&!(v===Infinity||v===-Infinity))continue;const s=Math.sign(v);if(s!==0){prev=last;last=s}}
+  if(last!==0&&(prev===0||prev===last))return last;
+  return 0;
+}
+function numEstimate(N,ctx){ // оценка предела по последовательности точек
+  const xs=ctx.a.k==='fin'?[1e-4,1e-5,1e-6].map(h=>ctx.a.v+ctx.s*h*Math.max(1,Math.abs(ctx.a.v))):[1e4,1e6,1e8].map(x=>(ctx.a.k==='pinf'?1:-1)*x);
+  const vs=xs.map(x=>ev(N,x));return vs;
+}
+
+/* ---------- основной обход ---------- */
+const MEMO=new Map();
+function lv(N,ctx){
+  if(ctx.depth>40||ctx.budget.n++>20000)return FAIL;
+  const mk_=key(N)+'|'+ctx.s+'|'+(ctx.a.k==='fin'?ctx.a.v:ctx.a.k)+'|'+ctx.lh;
+  if(ctx.silent&&MEMO.has(mk_))return MEMO.get(mk_);
+  const r=lv0(N,ctx);
+  if(r.k!=='fail')MEMO.set(mk_,r);
+  return r;
+}
+function lv0(N,ctx){
+  switch(N.t){
+    case 'num':case 'c':return FIN(N);
+    case 'v':return N.n==='x'?ctx.a:NONE;
+    case 'neg':return negL(lv(N.a,ctx));
+    case 'add':return lvAdd(N,ctx);
+    case 'mul':{const [P,Q]=numden(N);if(Q)return lvDiv(P,Q,ctx);return lvMul(N,ctx)}
+    case 'div':return lvDiv(N.a,N.b,ctx);
+    case 'pow':{if(N.b.t==='num'&&val(N.b)<0&&has(N.a))return lvDiv(N1,powS(N.a,num(-N.b.p,N.b.q)),ctx);return lvPow(N,ctx)}
+    case 'fn':return lvFn(N,ctx);
+  }
+  return NONE;
+}
+function numden(N){ // mul → [числитель, знаменатель|null]
+  if(N.t==='div')return [N.a,N.b];
+  if(N.t==='pow'&&N.b.t==='num'&&val(N.b)<0&&has(N.a)){const e=num(-N.b.p,N.b.q);return [N1,isNum(e,1)?N.a:pow(N.a,e)]}
+  if(N.t!=='mul')return [N,null];
+  const top=[],bot=[];
+  for(const f of N.a){
+    if(f.t==='num'&&!f.fl&&f.q!==1){top.push(num(f.p));bot.push(num(f.q))}
+    else if(f.t==='pow'&&f.b.t==='num'&&val(f.b)<0&&has(f.a)){const e=num(-f.b.p,f.b.q);bot.push(isNum(e,1)?f.a:pow(f.a,e))}
+    else if(f.t==='div'){top.push(f.a);bot.push(f.b)}
+    else top.push(f);
+  }
+  if(!bot.length||!bot.some(b=>has(b)))return [N,null];
+  const mk1=a=>a.length===0?N1:a.length===1?a[0]:mul(a);
+  return [mk1(top),mk1(bot)];
+}
+function lvAdd(N,ctx){
+  const Ls=N.a.map(t=>lv(t,child(ctx,true)));
+  if(Ls.some(L=>L.k==='fail'))return FAIL;
+  if(Ls.some(L=>L.k==='none'))return NONE;
+  const p=Ls.some(L=>L.k==='pinf'),m=Ls.some(L=>L.k==='minf');
+  if(p&&m)return resolve(N,'∞−∞',ctx);
+  // повторяем с объяснениями для слагаемых, где были неопределённости
+  const Lv=N.a.map(t=>subIfNeeded(t,ctx));
+  if(p)return PINF;if(m)return MINF;
+  if(Lv.some(L=>L.k==='bnd'))return BND;
+  return FIN(addS(Lv.map(L=>L.N)));
+}
+function subIfNeeded(T,ctx){ // предел части; если там была неопределённость — показать её разбор отдельным пунктом
+  const c=child(ctx,false);const L=lv(T,c);
+  if(!ctx.silent&&c.steps.length)push(ctx,`${LIMH(T,ctx)} = ${LH(L)}:`,c.steps);
+  return L;
+}
+function lvMul(N,ctx){
+  const Ls=N.a.map(t=>lv(t,child(ctx,true)));
+  if(Ls.some(L=>L.k==='fail'))return FAIL;
+  if(Ls.some(L=>L.k==='none'))return NONE;
+  const z=Ls.some(isZero),inf=Ls.some(isInf),b=Ls.some(L=>L.k==='bnd');
+  if(z&&inf)return resolve(N,'0·∞',ctx);
+  if(z&&b){push(ctx,`Произведение бесконечно малой на ограниченную функцию — бесконечно малая: ${LIMH(N,ctx)} = 0.`);return FIN(N0)}
+  if(inf&&b)return NONE;
+  const Lv=N.a.map(t=>subIfNeeded(t,ctx));
+  if(z)return FIN(N0);
+  if(b)return BND;
+  if(inf){let s=1;for(const L of Lv)s*=sgnL(L);return infOf(s)}
+  return FIN(mulS(Lv.map(L=>L.N)));
+}
+function lvDiv(P,Q,ctx){
+  const LP0=lv(P,child(ctx,true)),LQ0=lv(Q,child(ctx,true));
+  if(bad(LP0)||bad(LQ0))return LP0.k==='fail'||LQ0.k==='fail'?FAIL:NONE;
+  if(isZero(LP0)&&isZero(LQ0))return resolve(div(P,Q),'0/0',ctx);
+  if(isInf(LP0)&&isInf(LQ0))return resolve(div(P,Q),'∞/∞',ctx);
+  const LP=subIfNeeded(P,ctx),LQ=subIfNeeded(Q,ctx);
+  if(LP.k==='bnd'){if(isInf(LQ)){push(ctx,`Ограниченная функция, делённая на бесконечно большую, стремится к 0.`);return FIN(N0)}return LQ.k==='fin'&&!isZero(LQ)?BND:NONE}
+  if(LQ.k==='bnd')return NONE;
+  if(isInf(LQ))return FIN(N0);
+  if(isZero(LQ)){
+    const s=sign0(Q,ctx);if(!s)return NONE;
+    const r=infOf(sgnL(LP)*s);
+    push(ctx,`Числитель → ${isInf(LP)?LH(LP):R(LP.N)}, знаменатель ${R(Q)} → 0 ${s>0?'со стороны положительных значений (+0)':'со стороны отрицательных значений (−0)'} ⇒ ${LH(r)}.`);
+    return r;
+  }
+  if(isInf(LP))return infOf(sgnL(LP)*sgnL(LQ));
+  return FIN(mulS([LP.N,powS(LQ.N,NM1)]));
+}
+function lvPow(N,ctx){
+  const A=N.a,B=N.b;
+  if(!has(B)){
+    const LA0=lv(A,child(ctx,true));if(bad(LA0))return LA0;
+    const LA=subIfNeeded(A,ctx);
+    const bv=ev(B,{});
+    if(LA.k==='bnd')return bv>0?BND:NONE;
+    if(isZero(LA)){
+      const sA=sign0(A,ctx);
+      if(sA<0&&B.t==='num'&&!B.fl&&B.q%2===0)return NONE;
+      if(bv>0)return FIN(N0);
+      const s=sign0(N,ctx);return s?infOf(s):NONE;
+    }
+    if(LA.k==='pinf')return bv>0?PINF:FIN(N0);
+    if(LA.k==='minf'){if(bv<0)return FIN(N0);const s=sign0(N,ctx);return s?infOf(s):NONE}
+    if(LA.v<0&&B.t==='num'&&!B.fl&&B.q%2===0)return NONE;
+    return FIN(powS(LA.N,B));
+  }
+  const LA0=lv(A,child(ctx,true)),LB0=lv(B,child(ctx,true));
+  if(bad(LA0)||bad(LB0))return LA0.k==='fail'||LB0.k==='fail'?FAIL:NONE;
+  if(LA0.k==='fin'&&Math.abs(LA0.v-1)<1e-12&&isInf(LB0))return resolve(N,'1^∞',ctx);
+  if(isZero(LA0)&&isZero(LB0))return resolve(N,'0^0',ctx);
+  if(LA0.k==='pinf'&&isZero(LB0))return resolve(N,'∞^0',ctx);
+  const LA=subIfNeeded(A,ctx),LB=subIfNeeded(B,ctx);
+  if(LA.k==='fin'&&LA.v>0){
+    if(LB.k==='fin')return FIN(powS(LA.N,LB.N));
+    if(LB.k==='pinf')return Math.abs(LA.v-1)<1e-12?FIN(N1):LA.v>1?PINF:FIN(N0);
+    if(LB.k==='minf')return LA.v>1?FIN(N0):PINF;
+    if(LB.k==='bnd')return BND;
+  }
+  if(isZero(LA)){if(LB.k==='fin')return LB.v>0?FIN(N0):PINF;if(LB.k==='pinf')return FIN(N0);if(LB.k==='minf')return PINF}
+  if(LA.k==='pinf'){if(LB.k==='pinf'||(LB.k==='fin'&&LB.v>0))return PINF;if(LB.k==='minf'||(LB.k==='fin'&&LB.v<0))return FIN(N0)}
+  return NONE;
+}
+const PI2=()=>mul([HALF,C('pi')]);
+function lvFn(N,ctx){
+  const f=N.f,A=N.a;
+  const LA0=lv(A,child(ctx,true));if(bad(LA0))return LA0;
+  const LA=subIfNeeded(A,ctx);
+  if(LA.k==='fin'){const c=LA.v;
+    if(f==='ln'||f==='lg'){if(Math.abs(c)<1e-12){return sign0(A,ctx)>0?MINF:NONE}if(c<0)return NONE}
+    if(f==='tg'&&Math.abs(Math.cos(c))<1e-12){const s=sign0(N,ctx);return s?infOf(s):NONE}
+    if(f==='ctg'&&Math.abs(Math.sin(c))<1e-12){const s=sign0(N,ctx);return s?infOf(s):NONE}
+    if(f==='cth'&&Math.abs(c)<1e-12){const s=sign0(N,ctx);return s?infOf(s):NONE}
+    if((f==='arcsin'||f==='arccos')&&Math.abs(c)>1+1e-12)return NONE;
+    return FIN(fn(f,LA.N));
+  }
+  if(LA.k==='pinf')return ({ln:PINF,lg:PINF,arctg:FIN(PI2()),arcctg:FIN(N0),sh:PINF,ch:PINF,th:FIN(N1),cth:FIN(N1),abs:PINF,sin:BND,cos:BND})[f]||NONE;
+  if(LA.k==='minf')return ({arctg:FIN(neg(PI2())),arcctg:FIN(C('pi')),sh:MINF,ch:PINF,th:FIN(NM1),cth:FIN(NM1),abs:PINF,sin:BND,cos:BND})[f]||NONE;
+  if(LA.k==='bnd')return ['sin','cos','arctg','th','abs'].includes(f)?BND:NONE;
+  return NONE;
+}
+
+/* упрощение: S + приведение «дробных» сумм к общему знаменателю */
+function fracIn(A){return A.t==='add'&&A.a.some(t=>(t.t==='mul'&&t.a.some(f=>f.t==='pow'&&f.b.t==='num'&&val(f.b)<0&&has(f.a)))||(t.t==='pow'&&t.b.t==='num'&&val(t.b)<0&&has(t.a)))}
+function clean(N){
+  let M=S(N);
+  const fix=A=>{if(fracIn(A)){const T=together(A);return T?S(T):A}return A};
+  if(M.t==='add')M=fix(M);
+  else if(M.t==='mul')M=S(mul(M.a.map(f=>f.t==='pow'&&f.b.t==='num'?pow(fix(f.a),f.b):fix(f))));
+  else if(M.t==='pow')M=S(pow(fix(M.a),M.b));
+  return M;
+}
+/* ---------- раскрытие неопределённостей ---------- */
+const TYPE_NAME={'0/0':'0/0','∞/∞':'∞/∞','∞−∞':'∞ − ∞','0·∞':'0·∞','1^∞':'1<sup>∞</sup>','0^0':'0<sup>0</sup>','∞^0':'∞<sup>0</sup>'};
+function resolve(N,type,ctx){
+  if(ctx.depth>30)return FAIL;
+  const c=child(ctx,ctx.silent);
+  let L=FAIL;
+  const head=`Неопределённость <b>${TYPE_NAME[type]}</b>: ${LIMH(N,ctx)}.`;
+  const tries={
+    '0/0':[tryAbs,tryRational,tryConjugate,tryEquiv,tryLhopital],
+    '∞/∞':[tryAbs,tryRational,tryLeading,tryDominant,tryTermwise,tryExpRatio,tryLhopital],
+    '∞−∞':[tryAbs,tryLeadSum,tryConjugateSum,tryLogCombine,tryCombine,tryFactorOut],
+    '0·∞':[tryEquivProduct,tryToFraction],
+    '1^∞':[tryOneInf],'0^0':[tryExpLog],'∞^0':[tryExpLog]}[type];
+  for(const t of tries){
+    const cc=child(ctx,ctx.silent);
+    const r=t(N,cc,type);
+    if(r&&r.k!=='fail'){L=r;c.steps=cc.steps;break}
+  }
+  if(!ctx.silent)push(ctx,head,c.steps);
+  return L;
+}
+function subLim(M,ctx,title){ // предел нового выражения с отдельным списком шагов
+  const c=child(ctx,ctx.silent);const L=lv(M,c);
+  if(L.k==='fail')return FAIL;
+  if(!has(M)&&!c.steps.length)return L;
+  push(ctx,`${title?title+' ':''}${LIMH(M,ctx)} = <b>${LH(L)}</b>${c.steps.length?':':''}`,c.steps);
+  return L;
+}
+
+/* 1. Многочлены: разложение на (x − a) или старшие степени */
+function polyOf(N){const P=toPoly(N);return P&&[...P.keys()].every(k=>k>=0)?P:null}
+function pArr(P){const d=Math.max(...[...P.keys()].filter(k=>!isNum(P.get(k),0)),0);const a=[];for(let k=d;k>=0;k--)a.push(P.get(k)||N0);return a} // старшие сначала
+function arrPoly(a){const P=new Map();a.forEach((c,i)=>P.set(a.length-1-i,c));return P}
+function polyAST(a){const t=fromPolyTerms(arrPoly(a));return t.length===0?N0:t.length===1?t[0]:DX._.addS(t)}
+function synth(a,r){ // деление на (x − r): [частное, остаток]
+  const q=[];let acc=N0;for(const c of a){acc=radd(rmul(acc,r),c);q.push(acc)}const rem=q.pop();return [q,rem]}
+function tryRational(N,ctx,type){
+  const P=N.a,Q=N.b;const pp=polyOf(P),qq=polyOf(Q);if(!pp||!qq)return null;
+  let a=pArr(pp),b=pArr(qq);
+  if(ctx.a.k==='fin'){
+    const r=ctx.a.N;if(r.t!=='num'||r.fl)return null;
+    let k=0;const lines=[];
+    for(;;){const [qa,ra]=synth(a,r),[qb,rb]=synth(b,r);if(!isNum(ra,0)||!isNum(rb,0)||!qa.length||!qb.length)break;a=qa;b=qb;k++;if(k>6)break}
+    if(!k)return null;
+    const xa=S(add([X,num(-r.p,r.q)]));const xk=k===1?xa:pow(xa,num(k));
+    push(ctx,`При x = ${R(r)} и числитель, и знаменатель равны нулю ⇒ оба делятся на (${R(xa)}). Раскладываем (деление «уголком» или схема Горнера):`);
+    push(ctx,`${R(P)} = ${k===1?'(':''}${R(xk)}${k===1?')':''}·(${R(polyAST(a))}),&nbsp;&nbsp; ${R(Q)} = ${k===1?'(':''}${R(xk)}${k===1?')':''}·(${R(polyAST(b))})`);
+    push(ctx,`Сокращаем на ${k===1?'('+R(xa)+')':R(xk)} — при x ≠ ${R(r)} это законно.`);
+    return subLim(div(polyAST(a),polyAST(b)),ctx,'Остаётся');
+  }
+  // x → ±∞: старшие степени
+  const dp=a.length-1,dq=b.length-1,cp=a[0],cq=b[0];
+  const m=Math.max(dp,dq);
+  push(ctx,`Делим числитель и знаменатель на старшую степень ${m===1?'x':'x<sup>'+m+'</sup>'}: все слагаемые вида C/x<sup>k</sup> → 0, остаются только старшие члены.`);
+  const lead=S(div(mul([cp,pow(X,num(dp))]),mul([cq,pow(X,num(dq))])));
+  if(dp===dq){const L=FIN(div(cp,cq));push(ctx,`Степени равны (${dp}) ⇒ предел равен отношению старших коэффициентов: <b>${LH(L)}</b>.`);return L}
+  if(dp<dq){push(ctx,`Степень знаменателя больше ⇒ дробь ~ ${R(lead)} → <b>0</b>.`);return FIN(N0)}
+  const L=lv(lead,child(ctx,true));
+  push(ctx,`Степень числителя больше ⇒ дробь ~ ${R(lead)} → <b>${LH(L)}</b>.`);
+  return L;
+}
+/* 2. Главные части при x → ±∞ (с корнями) */
+function lead(N){ // при x → +∞: {c: AST, p: число}
+  switch(N.t){
+    case 'num':return isNum(N,0)?null:{c:N,p:0};
+    case 'c':return {c:N,p:0};
+    case 'v':return N.n==='x'?{c:N1,p:1}:null;
+    case 'neg':{const l=lead(N.a);return l&&{c:mulS([NM1,l.c]),p:l.p}}
+    case 'add':{const ls=N.a.map(lead);if(ls.some(l=>!l))return null;const pm=Math.max(...ls.map(l=>l.p));
+      const cs=ls.filter(l=>Math.abs(l.p-pm)<1e-12).map(l=>l.c);const c=addS(cs);if(Math.abs(ev(c,{}))<1e-12)return null;return {c,p:pm}}
+    case 'mul':{let c=N1,p=0;for(const f of N.a){const l=lead(f);if(!l)return null;c=mulS([c,l.c]);p+=l.p}return {c,p}}
+    case 'div':{const a=lead(N.a),b=lead(N.b);if(!a||!b)return null;return {c:mulS([a.c,powS(b.c,NM1)]),p:a.p-b.p}}
+    case 'pow':{if(has(N.b)||N.b.t!=='num')return null;const l=lead(N.a);if(!l)return null;const cv=ev(l.c,{});if(cv<0&&!isInt(N.b))return null;return {c:powS(l.c,N.b),p:l.p*val(N.b)}}
+  }
+  return null;
+}
+function leadAST(l){return S(mul([l.c,pow(X,num(l.p))]))}
+function atPlusInf(N,ctx){ // для x → −∞ делаем замену x = −t
+  if(ctx.a.k==='pinf')return N;
+  if(ctx.a.k==='minf'){return tidy(subst(N,'x',mul([NM1,X])))}
+  return null;
+}
+function tryLeading(N,ctx){
+  if(ctx.a.k==='fin')return null;
+  const M=atPlusInf(N,ctx);const P=M.t==='div'?M.a:numden(M)[0],Q=M.t==='div'?M.b:numden(M)[1];if(!Q)return null;
+  const a=lead(P),b=lead(Q);if(!a||!b)return null;
+  if(ctx.a.k==='minf')push(ctx,`Замена x = −t, t → +∞ (и снова пишем x вместо t): ${R(M)}.`);
+  push(ctx,`При x → +∞ в каждой сумме главное слагаемое — с наибольшей степенью (√(x² + …) ведёт себя как x): числитель ~ ${R(leadAST(a))}, знаменатель ~ ${R(leadAST(b))}.`);
+  const r=S(div(leadAST(a),leadAST(b)));
+  const c2=mk(PINF,1,{silent:true});const L=lv(r,c2);
+  push(ctx,has(r)?`Отношение главных частей: ${R(r)} → <b>${LH(L)}</b>.`:`Отношение главных частей: <b>${LH(L)}</b>.`);
+  return L;
+}
+function tryLeadSum(N,ctx){
+  if(ctx.a.k==='fin')return null;
+  const M=atPlusInf(N,ctx);const l=lead(M);if(!l||l.p<=0)return null;
+  const L=infOf(Math.sign(ev(l.c,{})));
+  if(ctx.a.k==='minf')push(ctx,`Замена x = −t, t → +∞: ${R(M)}.`);
+  push(ctx,`Выносим старшую степень: главное слагаемое ${R(leadAST(l))} растёт быстрее остальных ⇒ <b>${LH(L)}</b>.`);
+  return L;
+}
+/* 3. Сопряжённое */
+const isRootTerm=T=>{const fs=T.t==='mul'?T.a:[T];return fs.some(f=>f.t==='pow'&&isNum(f.b,0.5)&&has(f.a))};
+function conjParts(F){ // F = A + B, где в A есть корень
+  if(F.t!=='add'||F.a.length<2)return null;
+  const i=F.a.findIndex(isRootTerm);if(i<0)return null;
+  const A=S(F.a[i]),rest=F.a.filter((_,k)=>k!==i);const B=S(rest.length===1?rest[0]:add(rest));
+  if(DX._.isNeg(A)&&!DX._.isNeg(B))return {A:B,B:A};
+  return {A,B};
+}
+function expandSq(A,B){ // A² − B²
+  return S(add([powS(S(A),num(2)),mulS([NM1,powS(S(B),num(2))])]));
+}
+function tryConjugate(N,ctx){
+  const P=N.a,Q=N.b;
+  for(const [side,F,O] of [['num',P,Q],['den',Q,P]]){
+    const fs=F.t==='mul'?F.a:[F];
+    for(let i=0;i<fs.length;i++){const cp=conjParts(S(fs[i]));if(!cp)continue;
+      const {A,B}=cp;const conj=add([A,mulS([NM1,B])]);
+      const newF=expandSq(A,B);const others=fs.filter((_,k)=>k!==i);
+      const Fn=others.length?mul([...others,newF]):newF;const On=mul([O,conj]);
+      const Bp=DX._.isNeg(B)?DX._.negate(B):B;
+      push(ctx,`Домножаем числитель и знаменатель на сопряжённое выражение (${R(conj)}): (${R(fs[i])})(${R(conj)}) = (${R(A)})² − (${R(Bp)})² = ${R(newF)}.`);
+      const M=side==='num'?div(Fn,On):div(On,Fn);
+      const Ms=S(M);
+      push(ctx,`Получаем ${R(M)}${R(Ms)!==R(M)?` = ${R(Ms)}`:''}${R(Ms)!==R(M)?' (общий множитель сократился)':''}.`);
+      const L=subLim(Ms,ctx,'Теперь');
+      if(L.k!=='fail')return L;
+    }
+  }
+  return null;
+}
+function tryConjugateSum(N,ctx){
+  const M=S(ctx.a.k==='minf'?atPlusInf(N,ctx):N);
+  const cp=conjParts(M);if(!cp)return null;
+  const {A,B}=cp;const top=expandSq(A,B);const bot=S(add([A,mulS([NM1,B])]));const Bp=DX._.isNeg(B)?DX._.negate(B):B;
+  if(ctx.a.k==='minf')push(ctx,`Замена x = −t, t → +∞: ${R(M)}.`);
+  push(ctx,`Умножаем и делим на сопряжённое (${R(bot)}): ${R(M)} = ${R(div(add([pow(A,num(2)),neg(pow(Bp,num(2)))]),bot))} = ${R(div(top,bot))}.`);
+  const c2=ctx.a.k==='minf'?{...ctx,a:PINF}:ctx;
+  return subLim(div(top,bot),c2,'Теперь');
+}
+/* 4. Эквивалентные бесконечно малые */
+function equiv(F,ctx){ // F → 0; вернуть {E, why} или null
+  const lim0=T=>{const L=lv(T,child(ctx,true));return isZero(L)};
+  if(F.t==='fn'&&['sin','tg','arcsin','arctg','sh','th'].includes(F.f)&&lim0(F.a))return {E:F.a,why:`${F.f==='sin'?'sin':F.f==='tg'?'tg':F.f} u ~ u`};
+  if(F.t==='fn'&&F.f==='ln'){const L=lv(F.a,child(ctx,true));if(L.k==='fin'&&Math.abs(L.v-1)<1e-12){const E=S(add([F.a,NM1]));return {E,why:'ln(1 + u) ~ u'}}}
+  if(F.t==='add'){
+    const ts=F.a;
+    const one=ts.findIndex(t=>isNum(t,1)),m1=ts.findIndex(t=>isNum(t,-1));
+    const rest=(i)=>{const r=ts.filter((_,k)=>k!==i);return r.length===1?r[0]:null};
+    if(m1>=0){const T=rest(m1);if(T){
+      if(T.t==='pow'&&T.a.t==='c'&&T.a.n==='e'&&lim0(T.b))return {E:T.b,why:'e<sup>u</sup> − 1 ~ u'};
+      if(T.t==='pow'&&!hasAnyVar(T.a)&&lim0(T.b))return {E:S(mul([T.b,fn('ln',T.a)])),why:'a<sup>u</sup> − 1 ~ u ln a'};
+      if(T.t==='pow'&&!has(T.b)){const L=lv(T.a,child(ctx,true));if(L.k==='fin'&&Math.abs(L.v-1)<1e-12)return {E:S(mul([T.b,add([T.a,NM1])])),why:'(1 + u)<sup>k</sup> − 1 ~ k·u'}}
+      if(T.t==='fn'&&T.f==='cos'&&lim0(T.a))return {E:S(mul([num(-1,2),pow(T.a,num(2))])),why:'cos u − 1 ~ −u²/2'};
+    }}
+    if(one>=0){const T=rest(one);if(T&&T.t==='mul'&&T.a.length===2&&isNum(T.a[0],-1)){const U=T.a[1];
+      if(U.t==='fn'&&U.f==='cos'&&lim0(U.a))return {E:S(mul([HALF,pow(U.a,num(2))])),why:'1 − cos u ~ u²/2'};
+      if(U.t==='pow'&&!has(U.b)){const L=lv(U.a,child(ctx,true));if(L.k==='fin'&&Math.abs(L.v-1)<1e-12)return {E:S(mul([NM1,U.b,add([U.a,NM1])])),why:'1 − (1 + u)<sup>k</sup> ~ −k·u'}}
+      if(U.t==='pow'&&U.a.t==='c'&&U.a.n==='e'&&lim0(U.b))return {E:S(mul([NM1,U.b])),why:'1 − e<sup>u</sup> ~ −u'};
+    }}
+  }
+  return null;
+}
+function factorsOf(F){return F.t==='mul'?F.a:[F]}
+function replaceEquiv(fs,ctx,whys){
+  let changed=false;const out=[];
+  for(const f of fs){
+    const base=f.t==='pow'&&!has(f.b)?f.a:f,k=f.t==='pow'&&!has(f.b)?f.b:null;
+    const L=lv(base,child(ctx,true));
+    if(isZero(L)){
+      const e=equiv(base,ctx);
+      if(e){changed=true;whys.push(`${R(base)} ~ ${R(e.E)} <span class="why">(${e.why})</span>`);out.push(k?pow(e.E,k):e.E);continue}
+      out.push(f);continue;
+    }
+    out.push(f);
+  }
+  return changed?out:null;
+}
+function tryEquiv(N,ctx){
+  const whys=[];
+  const P=replaceEquiv(factorsOf(N.a),ctx,whys);if(P===null&&!whys.length){}
+  const whys2=[];
+  const Q=replaceEquiv(factorsOf(N.b),ctx,whys2);
+  if(!P&&!Q)return null;
+  const Pn=P||factorsOf(N.a),Qn=Q||factorsOf(N.b);
+  // все бесконечно малые множители должны быть заменены или многочленами
+  const okSide=(orig,rep)=>rep!==null||orig.every(f=>{const L=lv(f.t==='pow'&&!has(f.b)?f.a:f,child(ctx,true));return !isZero(L)||polyOf(f)||f.t==='v'});
+  // частичная замена тоже законна: меняем только те множители, для которых есть эквивалент
+  const M=div(Pn.length===1?Pn[0]:mul(Pn),Qn.length===1?Qn[0]:mul(Qn));
+  push(ctx,`Заменяем бесконечно малые множители эквивалентными (это можно делать только в произведениях и частных):`,[...whys,...whys2].map(t=>({text:t})));
+  const Ms=S(M);
+  push(ctx,`Получаем ${R(M)}${R(Ms)!==R(M)?' = '+R(Ms):''}.`);
+  return subLim(Ms,ctx,'');
+}
+function tryEquivProduct(N,ctx){
+  const whys=[];const fs=replaceEquiv(N.a,ctx,whys);if(!fs)return null;
+  const M=mul(fs);const Ms=S(M);
+  push(ctx,`Заменяем бесконечно малые множители эквивалентными:`,whys.map(t=>({text:t})));
+  push(ctx,`Получаем ${R(M)}${R(Ms)!==R(M)?' = '+R(Ms):''}.`);
+  return subLim(Ms,ctx,'');
+}
+/* 4б. Почленное деление: (x + sin x)/x = 1 + sin x/x */
+function tryTermwise(N,ctx){
+  const P=N.a,Q=N.b;
+  for(const [A,B,inv] of [[P,Q,false],[Q,P,true]]){
+    if(A.t!=='add')continue;
+    const parts=A.a.map(t=>({t,M:clean(div(t,B))}));
+    const Ls=parts.map(o=>lv(o.M,child(ctx,true)));
+    if(!Ls.every(L=>L.k==='fin'))continue;
+    const sum=FIN(addS(Ls.map(L=>L.N)));
+    if(inv&&isZero(sum))continue;
+    push(ctx,`Делим почленно${inv?' (перевёрнутую дробь)':''}: ${R(div(A,B))} = ${parts.map(o=>R(o.M)).join(' + ').replace(/\+ −/g,'− ')}.`,
+      parts.map((o,i)=>({text:`${LIMH(o.M,ctx)} = ${LH(Ls[i])}`})));
+    const L=inv?FIN(powS(sum.N,NM1)):sum;
+    if(inv)push(ctx,`Исходный предел — обратная величина: 1/(${LH(sum)}) = <b>${LH(L)}</b>.`);
+    else push(ctx,`Сумма пределов: <b>${LH(L)}</b>.`);
+    return L;
+  }
+  return null;
+}
+/* 4в. Модуль раскрываем по знаку */
+function findAbs(N){if(N.t==='fn'&&N.f==='abs'&&has(N.a))return N;for(const k of ['a','b']){if(N[k]&&typeof N[k]==='object'&&!Array.isArray(N[k])){const r=findAbs(N[k]);if(r)return r}}if(Array.isArray(N.a))for(const c of N.a){const r=findAbs(c);if(r)return r}return null}
+function replaceNode(N,from,to){if(N===from)return to;const o={...N};for(const k of ['a','b']){if(Array.isArray(N[k]))o[k]=N[k].map(c=>replaceNode(c,from,to));else if(N[k]&&typeof N[k]==='object')o[k]=replaceNode(N[k],from,to)}return o}
+function tryAbs(N,ctx){
+  const A=findAbs(N);if(!A)return null;
+  const s=sign0(A.a,ctx);if(!s)return null;
+  const M=replaceNode(N,A,s>0?A.a:mulS([NM1,A.a]));
+  push(ctx,`Вблизи точки ${R(A.a)} ${s>0?'> 0':'< 0'}, поэтому ${R(A)} = ${s>0?R(A.a):'−('+R(A.a)+')'}.`);
+  return subLim(clean(M),ctx,'');
+}
+/* 5. Лопиталь */
+function tryLhopital(N,ctx){
+  if(ctx.lh>=6)return null;
+  const P=N.a,Q=N.b;
+  const dP=deriv(P),dQ=deriv(Q);
+  ctx.lh++;
+  push(ctx,`Правило Лопиталя: предел отношения равен пределу отношения производных.`,[{text:`(${R(P)})′ = ${R(dP)}`},{text:`(${R(Q)})′ = ${R(dQ)}`}]);
+  const M0=div(dP,dQ),M=clean(M0);
+  const c=child(ctx,ctx.silent);c.lh=ctx.lh;const L=lv(M,c);
+  if(L.k==='fail'||L.k==='bnd'||L.k==='none')return null; // Лопиталь не дал ответа — пробуем иначе
+  const same=R(M)===R(M0);
+  push(ctx,`${LIMH(M0,ctx)}${same?'':' = '+LIMH(M,ctx)} = <b>${LH(L)}</b>${c.steps.length?':':''}`,c.steps);
+  return L;
+}
+/* 6. 0·∞ → дробь */
+function tryToFraction(N,ctx){
+  const Ls=N.a.map(t=>lv(t,child(ctx,true)));
+  const Z=N.a.filter((_,i)=>isZero(Ls[i])),O=N.a.filter((_,i)=>!isZero(Ls[i]));
+  const mk1=a=>a.length===1?a[0]:mul(a);
+  const pre=clean(N);
+  if(R(pre)!==R(N)){const [P,Q]=numden(pre);if(Q){push(ctx,`Упрощаем: ${R(N)} = ${R(div(P,Q))}.`);return subLim(div(P,Q),ctx,'')}}
+  const cands=[div(mk1(O),clean(powS(S(mk1(Z)),NM1))),div(mk1(Z),clean(powS(S(mk1(O)),NM1)))];
+  for(const M of cands){
+    const tc=child(ctx,true);const test=lv(M,tc);
+    if(test.k!=='fail'){
+      push(ctx,`Переписываем произведение дробью: ${R(N)} = ${R(M)} — получаем неопределённость вида 0/0 или ∞/∞.`);
+      return subLim(M,ctx,'');
+    }
+  }
+  return null;
+}
+/* 7. ∞ − ∞ → общий знаменатель / вынос главного */
+function hasTrigQ(N){if(N.t==='fn'&&(N.f==='tg'||N.f==='ctg'))return true;return ['a','b'].some(k=>N[k]&&(Array.isArray(N[k])?N[k].some(hasTrigQ):typeof N[k]==='object'&&hasTrigQ(N[k])))}
+function trigToSinCos(N){
+  if(N.t==='fn'&&N.f==='tg')return div(fn('sin',trigToSinCos(N.a)),fn('cos',trigToSinCos(N.a)));
+  if(N.t==='fn'&&N.f==='ctg')return div(fn('cos',trigToSinCos(N.a)),fn('sin',trigToSinCos(N.a)));
+  const o={...N};for(const k of ['a','b']){if(Array.isArray(N[k]))o[k]=N[k].map(trigToSinCos);else if(N[k]&&typeof N[k]==='object')o[k]=trigToSinCos(N[k])}return o;
+}
+function tryLogCombine(N,ctx){ // ln A − ln B = ln(A/B)
+  const ts=N.a;const logs=[],rest=[];
+  for(const t of ts){const [k,r]=t.t==='mul'&&t.a.length===2&&t.a[0].t==='num'?[t.a[0],t.a[1]]:t.t==='neg'?[NM1,t.a]:[N1,t];
+    if(r.t==='fn'&&r.f==='ln'&&isInt(k))logs.push({k:val(k),u:r.a});else rest.push(t)}
+  if(logs.length<2)return null;
+  const top=[],bot=[];for(const o of logs){const f=Math.abs(o.k)===1?o.u:pow(o.u,num(Math.abs(o.k)));(o.k>0?top:bot).push(f)}
+  const mk1=a=>a.length===0?N1:a.length===1?a[0]:mul(a);
+  const L1=fn('ln',bot.length?div(mk1(top),mk1(bot)):mk1(top));
+  const M=rest.length?add([L1,...rest]):L1;
+  push(ctx,`Объединяем логарифмы: ln A − ln B = ln(A/B): ${R(N)} = ${R(M)}.`);
+  return subLim(M,ctx,'');
+}
+/* a^u / b^v с постоянными основаниями → через e */
+function expForm(N){
+  if(N.t==='pow'&&!hasAnyVar(N.a)&&has(N.b)&&!(N.a.t==='c'&&N.a.n==='e'))return pow(C('e'),mul([expForm(N.b),fn('ln',N.a)]));
+  const o={...N};for(const k of ['a','b']){if(Array.isArray(N[k]))o[k]=N[k].map(expForm);else if(N[k]&&typeof N[k]==='object')o[k]=expForm(N[k])}return o;
+}
+function hasConstPow(N){if(N.t==='pow'&&!hasAnyVar(N.a)&&has(N.b)&&!(N.a.t==='c'&&N.a.n==='e'))return true;return ['a','b'].some(k=>N[k]&&(Array.isArray(N[k])?N[k].some(hasConstPow):typeof N[k]==='object'&&hasConstPow(N[k])))}
+function tryDominant(N,ctx){ // делим на самое быстрорастущее слагаемое знаменателя
+  const P=N.a,Q=N.b;if(Q.t!=='add'&&P.t!=='add')return null;
+  const terms=Q.t==='add'?Q.a:[Q];
+  const q=(M)=>lv(clean(hasConstPow(M)?expForm(M):M),child(ctx,true));
+  for(const D of terms){
+    const others=terms.filter(t=>t!==D);
+    if(!others.every(u=>q(div(u,D)).k==='fin'))continue;
+    const pt=(P.t==='add'?P.a:[P]).map(t=>q(div(t,D))),qt=terms.map(t=>q(div(t,D)));
+    if(!pt.every(L=>L.k==='fin')||!qt.every(L=>L.k==='fin'))continue;
+    const LP=FIN(addS(pt.map(L=>L.N))),LQ=FIN(addS(qt.map(L=>L.N)));if(isZero(LQ))continue;
+    push(ctx,`Делим числитель и знаменатель на самое быстрорастущее слагаемое ${R(D)} (остальные слагаемые, делённые на него, стремятся к конечным пределам, обычно к 0).`);
+    push(ctx,`Числитель/${R(D)} → ${LH(LP)}, знаменатель/${R(D)} → ${LH(LQ)}.`);
+    const L=FIN(mulS([LP.N,powS(LQ.N,NM1)]));push(ctx,`Предел: <b>${LH(L)}</b>.`);return L;
+  }
+  return null;
+}
+function tryExpRatio(N,ctx){
+  if(!hasConstPow(N))return null;
+  const M=clean(expForm(N));
+  push(ctx,`Показательные функции с разными основаниями пишем через e: a<sup>u</sup> = e<sup>u ln a</sup>: ${R(N)} = ${R(M)}.`);
+  return subLim(M,ctx,'');
+}
+function tryCombine(N,ctx){
+  const hasFrac=N.a.some(t=>numden(t)[1]||t.t==='div'||(t.t==='pow'&&t.b.t==='num'&&val(t.b)<0)||hasTrigQ(t));
+  if(!hasFrac)return null;
+  const N2=S(trigToSinCos(N));
+  const T=together(N2)||N2;
+  const [P,Q]=numden(S(T));
+  const M=Q?div(P,Q):S(T);
+  if(R(M)===R(N))return null;
+  push(ctx,`Приводим к общему знаменателю${R(N2)!==R(S(N))?' (tg и ctg записываем через sin и cos)':''}: ${R(N)} = ${R(M)}.`);
+  return subLim(M,ctx,'');
+}
+function tryFactorOut(N,ctx){
+  const ts=N.a;
+  for(let i=0;i<ts.length;i++){const T=ts[i];const Lt=lv(T,child(ctx,true));if(!isInf(Lt))continue;
+    const rest=ts.filter((_,k)=>k!==i);const Rr=rest.length===1?rest[0]:add(rest);
+    const ratio=div(Rr,T);const Lr=lv(ratio,child(ctx,true));
+    if(Lr.k!=='fin')continue;const one=1+Lr.v;if(Math.abs(one)<1e-12)continue;
+    push(ctx,`Выносим ${R(T)}: ${R(N)} = ${R(T)}·(1 + ${R(ratio)}).`);
+    subLim(ratio,ctx,'Во второй скобке');
+    const L=infOf(sgnL(Lt)*Math.sign(one));
+    push(ctx,`Скобка → ${R(S(add([N1,Lr.N])))} ≠ 0, множитель ${R(T)} → ${LH(Lt)} ⇒ <b>${LH(L)}</b>.`);
+    return L;
+  }
+  return null;
+}
+/* 8. Степенные неопределённости */
+function expResult(LE){if(LE.k==='fin')return FIN(pow(C('e'),LE.N));if(LE.k==='pinf')return PINF;if(LE.k==='minf')return FIN(N0);return LE}
+function tryOneInf(N,ctx){
+  const A=N.a,B=N.b;const Am=clean(add([A,NM1]));
+  push(ctx,`Второй замечательный предел: при A → 1, B → ∞ верно lim A<sup>B</sup> = e<sup>lim (A − 1)·B</sup>.`);
+  push(ctx,`A − 1 = ${R(add([A,NM1]))}${R(Am)!==R(add([A,NM1]))?' = '+R(Am):''}.`);
+  const Es=clean(mul([Am,B]));
+  const LE=subLim(Es,ctx,'Показатель:');if(LE.k==='fail')return null;
+  const L=expResult(LE);
+  push(ctx,`Итого: ${R(pow(C('e'),LE.k==='fin'?LE.N:N0))===LH(L)&&LE.k==='fin'?'<b>'+LH(L)+'</b>':'e<sup>'+LH(LE)+'</sup> = <b>'+LH(L)+'</b>'}.`);
+  return L;
+}
+function tryExpLog(N,ctx){
+  const A=N.a,B=N.b;const E=mul([B,fn('ln',A)]);
+  push(ctx,`Пишем через экспоненту: ${R(N)} = e<sup>${R(E)}</sup>, ищем предел показателя.`);
+  const LE=subLim(clean(E),ctx,'Показатель:');if(LE.k==='fail')return null;
+  const L=expResult(LE);
+  push(ctx,`Итого: e<sup>${LH(LE)}</sup> = <b>${LH(L)}</b>.`);
+  return L;
+}
+
+/* ---------- верхний уровень ---------- */
+function parseTarget(s){
+  const t=String(s).trim().toLowerCase().replace(/\s+/g,'').replace(/−/g,'-');
+  if(['∞','+∞','inf','+inf','infinity','oo','+oo'].includes(t))return {a:PINF,show:'inf'};
+  if(['-∞','-inf','-oo'].includes(t))return {a:MINF};
+  let side=0,u=t;
+  const m=t.match(/^(.*?)(\+0|-0|\+|-)$/);
+  if(m&&m[1]){u=m[1];side=m[2][0]==='+'?1:-1}
+  const N=S(parse(u));if(hasAnyVar(N))throw new Error('x₀ должно быть числом (например 0, 2, pi/2, 1+ или 1-)');
+  return {a:FIN(N),side};
+}
+function sameL(A,B){if(A.k!==B.k)return false;if(A.k==='fin')return Math.abs(A.v-B.v)<1e-9*Math.max(1,Math.abs(A.v));return true}
+function solve(src,target,sideOpt){
+  MEMO.clear();
+  const F=typeof src==='string'?parse(src):src;
+  const T=typeof target==='string'?parseTarget(target):target;
+  const side=sideOpt||T.side||0;
+  const run=(s,silent)=>{const c=mk(T.a,s,{silent,show:T.a.k==='fin'&&side?'side':(T.show||'')});const L=lv(F,c);return {L,steps:c.steps,ctx:c}};
+  let res;
+  if(T.a.k!=='fin'){res=run(1,false);res.L0=res.L}
+  else if(side){res=run(side,false)}
+  else{
+    const r=run(1,false),l=run(-1,true);
+    if(sameL(r.L,l.L)||r.L.k==='fail'||l.L.k==='fail'){res=r}
+    else{
+      const l2=run(-1,false);
+      const ctxS=mk(T.a,1,{show:'side'});
+      res={L:NONE,split:{left:l2.L,right:r.L},steps:[
+        {text:`Пределы слева и справа различаются — считаем каждый отдельно.`},
+        {text:`Справа (x → ${R(T.a.N)}+0): <b>${LH(r.L)}</b>`,sub:r.steps},
+        {text:`Слева (x → ${R(T.a.N)}−0): <b>${LH(l2.L)}</b>`,sub:l2.steps},
+        {text:`Односторонние пределы не равны ⇒ <b>предел не существует</b>${isInf(r.L)&&isInf(l2.L)?' (часто пишут ∞, имея в виду неограниченный рост модуля)':''}.`}],ctx:ctxS};
+    }
+  }
+  // если ничего не раскрывалось — показать подстановку
+  const c0=res.ctx;
+  if(!res.split&&!res.steps.length&&res.L.k==='fin'&&T.a.k==='fin'){
+    const sub=tidy(subst(F,'x',T.a.N));
+    res.steps=[{text:`Функция непрерывна в точке — подставляем x = ${R(T.a.N)}: ${R(sub)} = <b>${LH(res.L)}</b>.`}];
+  }else if(!res.split&&!res.steps.length){
+    res.steps=[{text:`${LIMH(F,c0)} = <b>${LH(res.L)}</b> (по пределам составных частей: ${T.a.k==='fin'?'подстановка':'поведение функций на бесконечности'}).`}];
+  }
+  // численная проверка
+  const chk=(L,sd)=>{
+    const xs=T.a.k==='fin'?[1e-2,1e-3,1e-4,1e-5].map(h=>T.a.v+sd*h*Math.max(1,Math.abs(T.a.v))):[10,30,1e2,1e3,1e4,1e5].map(x=>(T.a.k==='pinf'?1:-1)*x);
+    const vs=xs.map(x=>ev(F,x)).filter(v=>!Number.isNaN(v));if(vs.length<2)return L.k==='none'||L.k==='bnd';
+    if(L.k==='fin'){const errs=vs.filter(Number.isFinite).map(v=>Math.abs(v-L.v));if(!errs.length)return false;const tol=Math.max(1,Math.abs(L.v));
+      if(Math.min(...errs)<5e-3*tol)return true;
+      const n=errs.length;return n>=3&&errs[n-1]<errs[n-2]&&errs[n-2]<errs[n-3]&&errs[n-1]<0.1*tol}
+    const n=vs.length,v1=vs[n-2],v2=vs[n-1];
+    if(L.k==='pinf')return v2===Infinity||(v2>v1&&v2>vs[0]&&v2>0);
+    if(L.k==='minf')return v2===-Infinity||(v2<v1&&v2<vs[0]&&v2<0);
+    return true};
+  const sides=T.a.k==='fin'?(side?[side]:[1,-1]):[1];
+  res.verified=res.split?chk(res.split.right,1)&&chk(res.split.left,-1):sides.every(sd=>chk(res.L,sd));
+  {const xs=T.a.k==='fin'?[1e-3,1e-4,1e-5].map(h=>T.a.v+(side||1)*h*Math.max(1,Math.abs(T.a.v))):[1e3,1e4,1e5].map(x=>(T.a.k==='pinf'?1:-1)*x);
+   const vs=xs.map(x=>ev(F,x));res.numeric=vs.filter(v=>!Number.isNaN(v)).slice(-1)[0];}
+  res.F=F;res.T=T;res.side=side;
+  return res;
+}
+function headHTML(F,T,side){const c=mk(T.a,side||1,{show:T.a.k==='fin'&&side?'side':(T.show||'')});return LIMH(F,c)}
+return {solve,parseTarget,headHTML,LH,itemsHTML};
+})();
+if(typeof module!=='undefined')module.exports=LIM;
+
+</script>
+<script>
+/* ===================== Темы тренажёра по пределам ===================== */
+const F=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const M=s=>`<span class="m">${s}</span>`;
+const LQ=(sub,body)=>`<span class="lim">lim<sub>${sub}</sub></span> ${body}`;
+const TYPES=['Нет неопределённости','0/0','∞/∞','∞ − ∞','0·∞','1<sup>∞</sup>'];
+const METH=['Разложить на множители и сократить','Домножить на сопряжённое','Разделить на старшую степень','Эквивалентности / первый замечательный','Второй замечательный предел'];
+
+const TOPICS=[
+/* ------------------------------------------------------------ 1 */
+{title:'Как найти любой предел: алгоритм',lect:'Главная тема',
+theory:[
+`<b>Шаг 1. Подставь.</b> Всегда начинай с подстановки ${M('x = a')}. Если получилось число (или ${M(F('C','0'))}, ${M(F('C','∞'))}) — это и есть ответ. Большинство «страшных» пределов на этом и заканчиваются.`,
+`<b>Шаг 2. Определи тип неопределённости.</b> Их семь: ${M(F('0','0'))}, ${M(F('∞','∞'))}, ${M('∞ − ∞')}, ${M('0·∞')}, ${M('1<sup>∞</sup>')}, ${M('0<sup>0</sup>')}, ${M('∞<sup>0</sup>')}. Выражения ${M(F('5','0'))}, ${M(F('5','∞'))}, ${M('∞ + ∞')}, ${M('∞·∞')}, ${M('2<sup>∞</sup>')} — <b>не</b> неопределённости, у них ответ известен сразу.`,
+`<b>Шаг 3. Выбери метод по типу и виду функции:</b><br>• ${M(F('0','0'))} в многочленах → разложить на множители и сократить ${M('(x − a)')};<br>• ${M(F('0','0'))} с корнями → домножить на сопряжённое;<br>• ${M(F('0','0'))} с sin, tg, eˣ, ln → эквивалентности (первый замечательный предел);<br>• ${M(F('∞','∞'))} → разделить на старшую степень (самое быстрорастущее слагаемое);<br>• ${M('∞ − ∞')} → общий знаменатель или сопряжённое;<br>• ${M('0·∞')} → переписать дробью;<br>• ${M('1<sup>∞</sup>')} → второй замечательный предел ${M('e<sup>lim (A−1)B</sup>')};<br>• ${M('0<sup>0</sup>, ∞<sup>0</sup>')} → ${M('A<sup>B</sup> = e<sup>B ln A</sup>')};<br>• если ничего не подходит → правило Лопиталя.`,
+`<b>Шаг 4.</b> После преобразования снова подставь. Если неопределённость осталась — повтори шаг 3.`,
+`Если поведение функции слева и справа от точки разное (дробь с нулём в знаменателе, ${M('e<sup>1/x</sup>')}, ${M('arctg(1/x)')}, модуль), считай <b>односторонние пределы</b> отдельно. Совпали — предел есть, нет — не существует.`],
+ex:{q:LQ('x→2',F('x² − 4','x² − 3x + 2')),steps:[
+'Подставляем x = 2: (4 − 4)/(4 − 6 + 2) = 0/0 — неопределённость.',
+'Многочлены ⇒ раскладываем: x² − 4 = (x − 2)(x + 2), x² − 3x + 2 = (x − 2)(x − 1).',
+`Сокращаем (x − 2): ${F('x + 2','x − 1')}. Подставляем x = 2: 4/1 = 4.`]},
+probs:[
+{type:'choice',q:`Тип: ${LQ('x→2',F('x² − 4','x − 2'))}`,opts:TYPES,ans:1,hint:'Подставь x = 2 в числитель и знаменатель.',sol:['4 − 4 = 0 и 2 − 2 = 0 ⇒ 0/0.']},
+{type:'choice',q:`Тип: ${LQ('x→∞',F('x² + 1','2x²'))}`,opts:TYPES,ans:2,hint:'Что происходит с многочленами при x → ∞?',sol:['И числитель, и знаменатель неограниченно растут ⇒ ∞/∞.']},
+{type:'choice',q:`Тип: ${LQ('x→0','(1 + x)<sup>1/x</sup>')}`,opts:TYPES,ans:5,hint:'Основание → ?, показатель → ?',sol:['1 + x → 1, 1/x → ∞ ⇒ 1<sup>∞</sup>. Это второй замечательный предел, ответ e.']},
+{type:'choice',q:`Тип: ${LQ('x→+∞','(√(x² + 1) − x)')}`,opts:TYPES,ans:3,hint:'Оба слагаемых растут.',sol:['√(x² + 1) → ∞, x → ∞, между ними минус ⇒ ∞ − ∞.']},
+{type:'choice',q:`Тип: ${LQ('x→0+0','x ln x')}`,opts:TYPES,ans:4,hint:'x → 0, ln x → ?',sol:['ln x → −∞ ⇒ 0·∞.']},
+{type:'choice',q:`Тип: ${LQ('x→1',F('x² + 1','x + 1'))}`,opts:TYPES,ans:0,hint:'Просто подставь.',sol:['(1 + 1)/(1 + 1) = 1. Неопределённости нет, ответ 1.']},
+{type:'choice',q:`Каким методом удобнее всего: ${LQ('x→3',F('x² − 9','x² − 5x + 6'))}?`,opts:METH,ans:0,hint:'Числитель и знаменатель — многочлены.',sol:['(x − 3)(x + 3)/((x − 3)(x − 2)) → 6/1 = 6.']},
+{type:'choice',q:`Каким методом: ${LQ('x→4',F('√x − 2','x − 4'))}?`,opts:METH,ans:1,hint:'В числителе разность с корнем.',sol:['Домножаем на √x + 2: (x − 4)/((x − 4)(√x + 2)) → 1/4.']},
+{type:'choice',q:`Каким методом: ${LQ('x→0',F('sin 5x','x'))}?`,opts:METH,ans:3,hint:'sin u ~ u при u → 0.',sol:['sin 5x ~ 5x ⇒ 5x/x = 5.']},
+{type:'lim',f:'(x^2-4)/(x^2-3x+2)',a:'2',ans:'4',hint:'Это пример из разбора — реши сам.',sol:['(x − 2)(x + 2)/((x − 2)(x − 1)) → 4/1 = 4.']}
+]},
+/* ------------------------------------------------------------ 2 */
+{title:'Подстановка и арифметика бесконечностей',lect:'База',
+theory:[
+`Элементарные функции непрерывны там, где определены, поэтому ${M('lim f(x) = f(a)')} — просто подставь.`,
+`Правила с бесконечностями (C — число): ${M(F('C','0')+' = ∞')} (знак по знакам C и знаменателя), ${M(F('C','∞')+' = 0')}, ${M('∞ + C = ∞')}, ${M('∞ + ∞ = ∞')}, ${M('∞·∞ = ∞')}, ${M('C·∞ = ∞')} при C ≠ 0.`,
+`Показательная: ${M('e<sup>+∞</sup> = +∞')}, ${M('e<sup>−∞</sup> = 0')}; при ${M('a > 1')}: ${M('a<sup>+∞</sup> = ∞')}, при ${M('0 < a < 1')}: ${M('a<sup>+∞</sup> = 0')}.`,
+`${M('ln(+∞) = +∞')}, ${M('ln(0+0) = −∞')}, ${M('arctg(±∞) = ±π/2')}, ${M('arcctg(+∞) = 0')}, ${M('arcctg(−∞) = π')}.`,
+`${M(F('C','0'))} — смотри знак знаменателя: ${M(F('1','x − 3'))} при ${M('x → 3+0')} даёт ${M('+∞')}, при ${M('x → 3−0')} — ${M('−∞')}. А ${M(F('1','(x − 3)²'))} → ${M('+∞')} с обеих сторон.`,
+`Ограниченная функция, умноженная на бесконечно малую, — бесконечно малая: ${M(F('sin x','x')+' → 0')} при ${M('x → ∞')}.`],
+ex:{q:LQ('x→3±0',F('x + 2','x − 3')),steps:['Числитель → 5, знаменатель → 0.','Справа (x > 3) знаменатель положителен: 5/(+0) = +∞.','Слева знаменатель отрицателен: 5/(−0) = −∞. Двусторонний предел не существует.']},
+probs:[
+{type:'lim',f:'(x^2+3x-1)/(x+2)',a:'1',ans:'1',hint:'Подставь x = 1.',sol:['(1 + 3 − 1)/(1 + 2) = 3/3 = 1.']},
+{type:'lim',f:'sqrt(x+7)/x',a:'2',ans:'3/2',hint:'√9 = 3.',sol:['√9/2 = 3/2.']},
+{type:'lim',f:'e^(x^2)*cos(x)',a:'0',ans:'1',hint:'e⁰ = 1, cos 0 = 1.',sol:['1 · 1 = 1.']},
+{type:'lim',f:'1/(x-3)^2',a:'3',ans:'inf',hint:'Квадрат всегда положителен.',sol:['1/(+0) = +∞ с обеих сторон. Ответ: ∞ (введи inf).']},
+{type:'lim',f:'5/(x^2+1)',a:'inf',ans:'0',hint:'C/∞.',sol:['Знаменатель → ∞ ⇒ 0.']},
+{type:'lim',f:'arctg(x)',a:'inf',ans:'pi/2',hint:'График арктангенса.',sol:['arctg x → π/2 при x → +∞. Ввод: pi/2.']},
+{type:'lim',f:'1/(x-3)',a:'3+',ans:'inf',hint:'Знаменатель → +0.',sol:['1/(+0) = +∞.']},
+{type:'lim',f:'1/(x-3)',a:'3-',ans:'-inf',hint:'Знаменатель отрицательный и маленький.',sol:['1/(−0) = −∞.']},
+{type:'lim',f:'e^(1/x)',a:'0-',ans:'0',hint:'1/x → −∞.',sol:['e<sup>−∞</sup> = 0.']},
+{type:'lim',f:'(2+sin(x))/x',a:'inf',ans:'0',hint:'Числитель ограничен: от 1 до 3.',sol:['Ограниченная / ∞ → 0.']}
+]},
+/* ------------------------------------------------------------ 3 */
+{title:'∞/∞: деление на старшую степень',lect:'Дроби на бесконечности',
+theory:[
+`Для ${M(F('P(x)','Q(x)'))} при ${M('x → ∞')} делим числитель и знаменатель на старшую степень x. Все слагаемые вида ${M(F('C','xᵏ'))} уходят в 0.`,
+`Итог для многочленов: степени равны → ${M('отношение старших коэффициентов')}; степень числителя больше → ${M('∞')}; меньше → ${M('0')}.`,
+`Корни: ${M('√(x² + …) ~ |x|')}, ${M('√(ax²+…) ~ √a·|x|')}, ${M('∛(x³ + …) ~ x')}. При ${M('x → −∞')} помни: ${M('√(x²) = |x| = −x')}.`,
+`Показательные: делим на <b>самое быстрорастущее</b> слагаемое. ${M(F('2ˣ + 3ˣ','3ˣ + 1'))}: делим на 3ˣ, ${M('(2/3)ˣ → 0')}, ответ 1.`,
+`Шкала роста при ${M('x → +∞')}: ${M('ln x ≪ xᵃ ≪ aˣ ≪ x! ≪ xˣ')} (a > 1, a > 0 у степени). Что растёт быстрее — то и «побеждает» в дроби.`],
+ex:{q:LQ('x→∞',F('3x² − x + 2','5x² + 4')),steps:[`Делим на x²: ${F('3 − 1/x + 2/x²','5 + 4/x²')}.`,'1/x, 2/x², 4/x² → 0.','Ответ: 3/5.']},
+probs:[
+{type:'lim',f:'(3x^2-x+2)/(5x^2+4)',a:'inf',ans:'3/5',hint:'Пример из разбора.',sol:['Степени равны ⇒ 3/5.']},
+{type:'lim',f:'(x^3-2x)/(x^2+1)',a:'inf',ans:'inf',hint:'Степень числителя больше.',sol:['~ x³/x² = x → ∞.']},
+{type:'lim',f:'(4x+1)/(x^3-x)',a:'inf',ans:'0',hint:'Степень знаменателя больше.',sol:['~ 4x/x³ = 4/x² → 0.']},
+{type:'lim',f:'(2x-1)^3/(x^3+5)',a:'inf',ans:'8',hint:'Старший член (2x − 1)³ — это (2x)³.',sol:['8x³/x³ = 8.']},
+{type:'lim',f:'sqrt(x^2+1)/(3x-2)',a:'inf',ans:'1/3',hint:'√(x² + 1) ~ x при x → +∞.',sol:['x/(3x) = 1/3.']},
+{type:'lim',f:'sqrt(x^2+1)/(3x-2)',a:'-inf',ans:'-1/3',hint:'При x → −∞ √(x²) = −x.',sol:['√(x² + 1) ~ −x, (−x)/(3x) = −1/3.']},
+{type:'lim',f:'(sqrt(4x^2+x)+x)/(3x+1)',a:'inf',ans:'1',hint:'√(4x² + x) ~ 2x.',sol:['(2x + x)/(3x) = 1.']},
+{type:'lim',f:'(2^x+3^x)/(3^x+1)',a:'inf',ans:'1',hint:'Делим на 3ˣ.',sol:['((2/3)ˣ + 1)/(1 + 3⁻ˣ) → (0 + 1)/(1 + 0) = 1.']},
+{type:'lim',f:'(x^2+sin(x))/(2x^2+1)',a:'inf',ans:'1/2',hint:'sin x ограничен, sin x/x² → 0.',sol:['(1 + sin x/x²)/(2 + 1/x²) → 1/2.']}
+]},
+/* ------------------------------------------------------------ 4 */
+{title:'0/0 в многочленах: разложение',lect:'Сокращаем (x − a)',
+theory:[
+`Если многочлены ${M('P(a) = 0')} и ${M('Q(a) = 0')}, то оба делятся на ${M('(x − a)')} (теорема Безу). Разложи и сократи.`,
+`Инструменты: ${M('a² − b² = (a − b)(a + b)')}, ${M('a³ − b³ = (a − b)(a² + ab + b²)')}, ${M('a³ + b³ = (a + b)(a² − ab + b²)')}, ${M('ax² + bx + c = a(x − x₁)(x − x₂)')}.`,
+`Для многочлена высокой степени — деление «уголком» или схема Горнера на ${M('(x − a)')}.`,
+`Если после сокращения снова 0/0 — значит, ${M('a')} кратный корень, сокращай ещё раз.`,
+`Сокращать на ${M('(x − a)')} законно: в пределе ${M('x ≠ a')}, только приближается к a.`],
+ex:{q:LQ('x→1',F('x³ − 3x + 2','x³ − x² − x + 1')),steps:['0/0. Делим на (x − 1): x³ − 3x + 2 = (x − 1)(x² + x − 2), x³ − x² − x + 1 = (x − 1)(x² − 1).','После сокращения снова 0/0 при x = 1: x² + x − 2 = (x − 1)(x + 2), x² − 1 = (x − 1)(x + 1).',`Сокращаем ещё раз: ${F('x + 2','x + 1')} → 3/2.`]},
+probs:[
+{type:'lim',f:'(x^2-9)/(x-3)',a:'3',ans:'6',hint:'Разность квадратов.',sol:['(x − 3)(x + 3)/(x − 3) = x + 3 → 6.']},
+{type:'lim',f:'(x^2-5x+6)/(x^2-4)',a:'2',ans:'-1/4',hint:'x² − 5x + 6 = (x − 2)(x − 3).',sol:['(x − 3)/(x + 2) → −1/4.']},
+{type:'lim',f:'(x^3-8)/(x^2-4)',a:'2',ans:'3',hint:'Разность кубов.',sol:['(x² + 2x + 4)/(x + 2) → 12/4 = 3.']},
+{type:'lim',f:'(x^2+2x-3)/(x^2-1)',a:'1',ans:'2',hint:'x² + 2x − 3 = (x − 1)(x + 3).',sol:['(x + 3)/(x + 1) → 4/2 = 2.']},
+{type:'lim',f:'(x^3-1)/(x^2-1)',a:'1',ans:'3/2',hint:'x³ − 1 = (x − 1)(x² + x + 1).',sol:['(x² + x + 1)/(x + 1) → 3/2.']},
+{type:'lim',f:'(2x^2-x-1)/(x^2-1)',a:'1',ans:'3/2',hint:'Корни 2x² − x − 1: 1 и −1/2.',sol:['2x² − x − 1 = (x − 1)(2x + 1).','(2x + 1)/(x + 1) → 3/2.']},
+{type:'lim',f:'(x^4-16)/(x-2)',a:'2',ans:'32',hint:'x⁴ − 16 = (x² − 4)(x² + 4).',sol:['(x + 2)(x² + 4) → 4 · 8 = 32.']},
+{type:'lim',f:'(x^3-3x+2)/(x^3-x^2-x+1)',a:'1',ans:'3/2',hint:'Пример из разбора — корень кратный.',sol:['(x − 1)²(x + 2)/((x − 1)²(x + 1)) → 3/2.']},
+{type:'lim',f:'(x^2-x-2)/(x^2+3x+2)',a:'-1',ans:'-3',hint:'Общий множитель (x + 1).',sol:['(x − 2)(x + 1)/((x + 1)(x + 2)) = (x − 2)/(x + 2) → −3/1 = −3.']}
+]},
+/* ------------------------------------------------------------ 5 */
+{title:'Пределы с корнями: сопряжённое',lect:'Иррациональности',
+theory:[
+`Разность с корнем ${M('√A − B')} при подстановке даёт 0. Домножь числитель и знаменатель на <b>сопряжённое</b> ${M('√A + B')}: ${M('(√A − B)(√A + B) = A − B²')} — корень исчезает.`,
+`После этого обычно появляется множитель ${M('(x − a)')}, который сокращается с другой частью дроби.`,
+`Если корни и в числителе, и в знаменателе — домножай на оба сопряжённых сразу.`,
+`Для кубического корня: ${M('a − b = '+F('a³ − b³','a² + ab + b²'))}. Или эквивалентность ${M('(1 + u)<sup>k</sup> − 1 ~ k·u')}.`,
+`Быстрая проверка: ${M('√(1 + u) − 1 ~ u/2')} при ${M('u → 0')}.`],
+ex:{q:LQ('x→1',F('√(x + 3) − 2','x − 1')),steps:['Подстановка: (2 − 2)/0 = 0/0.',`Домножаем на √(x + 3) + 2: ${F('(x + 3) − 4','(x − 1)(√(x + 3) + 2)')} = ${F('1','√(x + 3) + 2')}.`,'Подставляем: 1/4.']},
+probs:[
+{type:'lim',f:'(sqrt(x+3)-2)/(x-1)',a:'1',ans:'1/4',hint:'Пример из разбора.',sol:['1/(√4 + 2) = 1/4.']},
+{type:'lim',f:'(sqrt(x)-3)/(x-9)',a:'9',ans:'1/6',hint:'x − 9 = (√x − 3)(√x + 3).',sol:['1/(√x + 3) → 1/6.']},
+{type:'lim',f:'x/(sqrt(1+x)-1)',a:'0',ans:'2',hint:'Сопряжённое к знаменателю: √(1 + x) + 1.',sol:['x(√(1 + x) + 1)/x = √(1 + x) + 1 → 2.']},
+{type:'lim',f:'(sqrt(1+x)-sqrt(1-x))/x',a:'0',ans:'1',hint:'Сопряжённое: √(1 + x) + √(1 − x).',sol:['(1 + x − 1 + x)/(x(√(1 + x) + √(1 − x))) = 2/(√(1 + x) + √(1 − x)) → 1.']},
+{type:'lim',f:'(sqrt(x+5)-3)/(sqrt(x+12)-4)',a:'4',ans:'4/3',hint:'Два сопряжённых: (√(x + 5) + 3) и (√(x + 12) + 4).',sol:['= (x − 4)(√(x + 12) + 4)/((x − 4)(√(x + 5) + 3)).','→ 8/6 = 4/3.']},
+{type:'lim',f:'(3-sqrt(x+5))/(x-4)',a:'4',ans:'-1/6',hint:'Сопряжённое: 3 + √(x + 5).',sol:['(9 − x − 5)/((x − 4)(3 + √(x + 5))) = −1/(3 + √(x + 5)) → −1/6.']},
+{type:'lim',f:'(cbrt(1+x)-1)/x',a:'0',q:LQ('x→0',F('∛(1 + x) − 1','x')),ans:'1/3',hint:'(1 + x)<sup>1/3</sup> − 1 ~ x/3.',sol:['Эквивалентность (1 + u)<sup>k</sup> − 1 ~ ku при k = 1/3: x/3 : x = 1/3.']},
+{type:'lim',f:'(x-2)/(sqrt(x+2)-2)',a:'2',ans:'4',hint:'Сопряжённое к знаменателю.',sol:['(x − 2)(√(x + 2) + 2)/(x − 2) → 4.']}
+]},
+/* ------------------------------------------------------------ 6 */
+{title:'Неопределённость ∞ − ∞',lect:'Разности',
+theory:[
+`<b>Дроби</b> (обычно при ${M('x → a')}): приведи к общему знаменателю — получится ${M(F('0','0'))}.`,
+`<b>Корни</b> (обычно при ${M('x → ∞')}): умножь и раздели на сопряжённое: ${M('√A − B = '+F('A − B²','√A + B'))}. Получится ${M(F('∞','∞'))} — дели на старшую степень.`,
+`<b>Многочлены</b>: старший член побеждает, ${M('x³ − 1000x² → +∞')}. Неопределённость только кажущаяся.`,
+`<b>Логарифмы</b>: ${M('ln A − ln B = ln '+F('A','B'))}.`,
+`Полезный результат: ${M('√(x² + px + q) − x → '+F('p','2'))} при ${M('x → +∞')}.`],
+ex:{q:LQ('x→+∞','(√(x² + 3x) − x)'),steps:[`Сопряжённое: ${F('x² + 3x − x²','√(x² + 3x) + x')} = ${F('3x','√(x² + 3x) + x')}.`,'Делим на x: 3/(√(1 + 3/x) + 1) → 3/2.']},
+probs:[
+{type:'lim',f:'sqrt(x^2+3x)-x',a:'inf',ans:'3/2',hint:'Пример из разбора.',sol:['3/(1 + 1) = 3/2.']},
+{type:'lim',f:'sqrt(x^2+1)-sqrt(x^2-1)',a:'inf',ans:'0',hint:'В числителе после сопряжённого — число 2.',sol:['2/(√(x² + 1) + √(x² − 1)) → 0.']},
+{type:'lim',f:'x-sqrt(x^2-4x)',a:'inf',ans:'2',hint:'Сопряжённое x + √(x² − 4x).',sol:['4x/(x + √(x² − 4x)) → 4/2 = 2.']},
+{type:'lim',f:'sqrt(x^2+x+1)-sqrt(x^2-x)',a:'inf',ans:'1',hint:'После сопряжённого числитель 2x + 1.',sol:['(2x + 1)/(√(x² + x + 1) + √(x² − x)) → 2/2 = 1.']},
+{type:'lim',f:'1/(x-1)-2/(x^2-1)',a:'1',ans:'1/2',hint:'Общий знаменатель x² − 1.',sol:['(x + 1 − 2)/(x² − 1) = (x − 1)/((x − 1)(x + 1)) = 1/(x + 1) → 1/2.']},
+{type:'lim',f:'1/(x-2)-4/(x^2-4)',a:'2',ans:'1/4',hint:'Общий знаменатель x² − 4.',sol:['(x + 2 − 4)/(x² − 4) = 1/(x + 2) → 1/4.']},
+{type:'lim',f:'x^3/(x^2+1)-x',a:'inf',ans:'0',hint:'Общий знаменатель.',sol:['(x³ − x³ − x)/(x² + 1) = −x/(x² + 1) → 0.']},
+{type:'lim',f:'sqrt(x^2+2x)+x',a:'-inf',ans:'-1',hint:'При x → −∞ это тоже ∞ − ∞; сопряжённое √(x² + 2x) − x.',sol:['(x² + 2x − x²)/(√(x² + 2x) − x) = 2x/(√(x² + 2x) − x).','При x → −∞: √(x² + 2x) ~ −x, знаменатель ~ −2x ⇒ 2x/(−2x) = −1.']},
+{type:'lim',f:'ln(2x+1)-ln(x+3)',a:'inf',ans:'ln(2)',hint:'Разность логарифмов — логарифм частного.',sol:['ln((2x + 1)/(x + 3)) → ln 2.']}
+]},
+/* ------------------------------------------------------------ 7 */
+{title:'Первый замечательный предел',lect:'sin u / u',
+theory:[
+`${M(LQ('x→0',F('sin x','x'))+' = 1')}. Работает для любого аргумента, стремящегося к 0: ${M(F('sin u','u')+' → 1')} при ${M('u → 0')}.`,
+`Следствия: ${M(F('tg x','x')+' → 1')}, ${M(F('arcsin x','x')+' → 1')}, ${M(F('arctg x','x')+' → 1')}, ${M(F('1 − cos x','x²')+' → '+F('1','2'))}.`,
+`Приём: подгони знаменатель под аргумент синуса. ${M(F('sin 7x','x')+' = 7·'+F('sin 7x','7x')+' → 7')}.`,
+`Если ${M('x → a ≠ 0')}, сделай замену ${M('t = x − a → 0')}: ${M('sin(x − 2) = sin t')}.`,
+`При ${M('x → ∞')} ${M(F('sin x','x')+' → 0')} — это уже не замечательный предел!`],
+ex:{q:LQ('x→0',F('1 − cos 4x','x sin x')),steps:['1 − cos 4x = 2sin² 2x.',`${F('2 sin² 2x','x sin x')} = 2 · ${F('sin 2x','2x')} · ${F('sin 2x','2x')} · 4x² / (x · sin x) → 2 · 4 = 8.`,'Или эквивалентностями: 1 − cos 4x ~ 8x², x sin x ~ x² ⇒ 8.']},
+probs:[
+{type:'lim',f:'sin(7x)/x',a:'0',ans:'7',hint:'Домножь и раздели на 7.',sol:['7 · sin 7x/(7x) → 7.']},
+{type:'lim',f:'sin(3x)/sin(5x)',a:'0',ans:'3/5',hint:'sin 3x ~ 3x, sin 5x ~ 5x.',sol:['3x/(5x) = 3/5.']},
+{type:'lim',f:'tg(2x)/x',a:'0',ans:'2',hint:'tg u ~ u.',sol:['2x/x = 2.']},
+{type:'lim',f:'(1-cos(x))/x^2',a:'0',ans:'1/2',hint:'1 − cos x = 2sin²(x/2).',sol:['2sin²(x/2)/x² = ½ · (sin(x/2)/(x/2))² → 1/2.']},
+{type:'lim',f:'(1-cos(4x))/(x*sin(x))',a:'0',ans:'8',hint:'Пример из разбора.',sol:['8.']},
+{type:'lim',f:'x*ctg(3x)',a:'0',ans:'1/3',q:LQ('x→0','x ctg 3x'),hint:'ctg 3x = cos 3x / sin 3x.',sol:['x cos 3x/sin 3x ~ x/(3x) = 1/3.']},
+{type:'lim',f:'sin(x-2)/(x^2-4)',a:'2',ans:'1/4',hint:'t = x − 2 → 0; x² − 4 = (x − 2)(x + 2).',sol:['sin(x − 2)/(x − 2) → 1, 1/(x + 2) → 1/4.']},
+{type:'lim',f:'arcsin(4x)/x',a:'0',ans:'4',hint:'arcsin u ~ u.',sol:['4x/x = 4.']},
+{type:'lim',f:'(tg(x)-sin(x))/x^3',a:'0',ans:'1/2',hint:'tg x − sin x = tg x (1 − cos x). Заменять нельзя почленно — сначала вынеси множитель!',sol:['tg x(1 − cos x) ~ x · x²/2 = x³/2.','Ответ 1/2. (Почленная замена tg x ~ x, sin x ~ x дала бы неверный 0.)']}
+]},
+/* ------------------------------------------------------------ 8 */
+{title:'Второй замечательный предел и 1<sup>∞</sup>',lect:'Число e',
+theory:[
+`${M(LQ('x→∞','(1 + '+F('1','x')+')<sup>x</sup>')+' = e')}, ${M(LQ('u→0','(1 + u)<sup>1/u</sup>')+' = e')}.`,
+`<b>Универсальная формула для 1<sup>∞</sup>:</b> если ${M('A → 1')}, ${M('B → ∞')}, то ${M('lim A<sup>B</sup> = e<sup>lim (A − 1)·B</sup>')}. Не нужно подгонять выражение под «каноничный» вид.`,
+`Пример: ${M('(1 + '+F('k','x')+')<sup>mx</sup> → e<sup>km</sup>')}, ${M('('+F('x + a','x + b')+')<sup>x</sup> → e<sup>a − b</sup>')}.`,
+`Проверь, что это действительно 1<sup>∞</sup>: ${M('('+F('2x + 1','x')+')<sup>x</sup>')} — это ${M('2<sup>∞</sup> = ∞')}, а не e-что-то.`,
+`Для ${M('0<sup>0</sup>')} и ${M('∞<sup>0</sup>')}: ${M('A<sup>B</sup> = e<sup>B ln A</sup>')} и ищем предел показателя.`],
+ex:{q:LQ('x→∞','('+F('x + 3','x − 1')+')<sup>x</sup>'),steps:['A = (x + 3)/(x − 1) → 1, B = x → ∞: это 1<sup>∞</sup>.',`A − 1 = ${F('4','x − 1')}, (A − 1)·B = ${F('4x','x − 1')} → 4.`,'Ответ: e⁴.']},
+probs:[
+{type:'lim',f:'(1+1/x)^(3x)',a:'inf',ans:'e^3',hint:'(A − 1)B = (1/x)·3x.',sol:['e³.']},
+{type:'lim',f:'(1+2/x)^x',a:'inf',ans:'e^2',hint:'(2/x)·x = 2.',sol:['e².']},
+{type:'lim',f:'(1-1/x)^x',a:'inf',ans:'e^(-1)',hint:'(−1/x)·x = −1.',sol:['e⁻¹ = 1/e. Ввод: e^(-1) или 1/e.']},
+{type:'lim',f:'((x+3)/(x-1))^x',a:'inf',ans:'e^4',hint:'Пример из разбора.',sol:['e⁴.']},
+{type:'lim',f:'((2x+1)/(2x-1))^x',a:'inf',ans:'e',hint:'A − 1 = 2/(2x − 1).',sol:['2x/(2x − 1) → 1 ⇒ e¹ = e.']},
+{type:'lim',f:'(1+3x)^(1/x)',a:'0',ans:'e^3',hint:'(A − 1)B = 3x · 1/x.',sol:['e³.']},
+{type:'lim',f:'(1+sin(x))^(1/x)',a:'0',ans:'e',hint:'sin x/x → 1.',sol:['e¹ = e.']},
+{type:'lim',f:'cos(x)^(1/x^2)',a:'0',q:LQ('x→0','(cos x)<sup>1/x²</sup>'),ans:'e^(-1/2)',hint:'cos x − 1 ~ −x²/2.',sol:['(cos x − 1)/x² → −1/2 ⇒ e<sup>−1/2</sup> = 1/√e.']},
+{type:'lim',f:'((x^2+1)/(x^2-1))^(x^2)',a:'inf',ans:'e^2',hint:'A − 1 = 2/(x² − 1).',sol:['2x²/(x² − 1) → 2 ⇒ e².']}
+]},
+/* ------------------------------------------------------------ 9 */
+{title:'Эквивалентные бесконечно малые',lect:'Таблица ~',
+theory:[
+`При ${M('u → 0')}: ${M('sin u ~ tg u ~ arcsin u ~ arctg u ~ u')}, ${M('1 − cos u ~ '+F('u²','2'))}.`,
+`${M('eᵘ − 1 ~ u')}, ${M('aᵘ − 1 ~ u ln a')}, ${M('ln(1 + u) ~ u')}, ${M('logₐ(1 + u) ~ '+F('u','ln a'))}, ${M('(1 + u)<sup>k</sup> − 1 ~ ku')}.`,
+`<b>Заменять можно только множители</b> в произведении или частном. В сумме/разности — нельзя (классическая ошибка: ${M('tg x − sin x')}).`,
+`Аргумент может быть любым, лишь бы → 0: ${M('ln(1 + 3x²) ~ 3x²')}, ${M('e<sup>sin x</sup> − 1 ~ sin x ~ x')}.`,
+`${M('ln u')} при ${M('u → 1')}: ${M('ln u = ln(1 + (u − 1)) ~ u − 1')}. Например, ${M('ln cos x ~ cos x − 1 ~ −x²/2')}.`],
+ex:{q:LQ('x→0',F('arctg x²','1 − cos x')),steps:['arctg x² ~ x², 1 − cos x ~ x²/2.',`${F('x²','x²/2')} = 2.`]},
+probs:[
+{type:'lim',f:'ln(1+5x)/x',a:'0',ans:'5',hint:'ln(1 + u) ~ u.',sol:['5x/x = 5.']},
+{type:'lim',f:'(e^(3x)-1)/sin(2x)',a:'0',ans:'3/2',hint:'e<sup>3x</sup> − 1 ~ 3x, sin 2x ~ 2x.',sol:['3/2.']},
+{type:'lim',f:'arctg(x^2)/(1-cos(x))',a:'0',ans:'2',hint:'Пример из разбора.',sol:['2.']},
+{type:'lim',f:'(2^x-1)/x',a:'0',ans:'ln(2)',hint:'aᵘ − 1 ~ u ln a.',sol:['ln 2. Ввод: ln(2).']},
+{type:'lim',f:'((1+x)^5-1)/x',a:'0',ans:'5',hint:'(1 + u)<sup>k</sup> − 1 ~ ku.',sol:['5x/x = 5.']},
+{type:'lim',f:'ln(cos(x))/x^2',a:'0',ans:'-1/2',hint:'ln cos x ~ cos x − 1.',sol:['−x²/2 : x² = −1/2.']},
+{type:'lim',f:'(e^(x^2)-1)/(x*tg(x))',a:'0',ans:'1',hint:'Все множители заменяются.',sol:['x²/(x·x) = 1.']},
+{type:'lim',f:'sin(3x)*tg(2x)/x^2',a:'0',ans:'6',hint:'Произведение — меняем каждый множитель.',sol:['3x · 2x/x² = 6.']},
+{type:'lim',f:'(sqrt(1+2x)-1)/sin(x)',a:'0',ans:'1',hint:'√(1 + 2x) − 1 ~ x.',sol:['(1 + 2x)<sup>1/2</sup> − 1 ~ ½ · 2x = x ⇒ x/x = 1.']}
+]},
+/* ------------------------------------------------------------ 10 */
+{title:'Правило Лопиталя и 0·∞, 0⁰, ∞⁰',lect:'Через производные',
+theory:[
+`Если ${M(F('f','g'))} даёт ${M(F('0','0'))} или ${M(F('∞','∞'))}, то ${M('lim '+F('f','g')+' = lim '+F('f′','g′'))} (если правый предел существует). Производные берутся <b>отдельно</b> у числителя и знаменателя — это не производная дроби!`,
+`Можно применять несколько раз подряд, но перед каждым разом проверяй, что неопределённость осталась.`,
+`${M('0·∞')} → дробь: ${M('f·g = '+F('f','1/g'))} или ${M(F('g','1/f'))}. Логарифм лучше оставлять в числителе: ${M('x ln x = '+F('ln x','1/x'))}.`,
+`${M('0⁰, ∞⁰, 1<sup>∞</sup>')} → ${M('A<sup>B</sup> = e<sup>B ln A</sup>')}; ищем ${M('lim B ln A')} (это 0·∞).`,
+`Лопиталь не всегда помогает: ${M(F('x + sin x','x'))} при ${M('x → ∞')} даёт ${M('1 + cos x')} — предела нет, но исходный предел = 1 (делим почленно). Отсутствие предела отношения производных не означает отсутствия исходного.`],
+ex:{q:LQ('x→0',F('x − sin x','x³')),steps:[`0/0 ⇒ ${F('1 − cos x','3x²')} — снова 0/0.`,`Ещё раз: ${F('sin x','6x')} → 1/6. (Или 1 − cos x ~ x²/2 ⇒ ${F('x²/2','3x²')} = 1/6.)`]},
+probs:[
+{type:'lim',f:'(x-sin(x))/x^3',a:'0',ans:'1/6',hint:'Пример из разбора.',sol:['1/6.']},
+{type:'lim',f:'(e^x-1-x)/x^2',a:'0',ans:'1/2',hint:'Два раза Лопиталь.',sol:['(eˣ − 1)/(2x) → eˣ/2 → 1/2.']},
+{type:'lim',f:'ln(x)/x',a:'inf',ans:'0',hint:'(ln x)′ = 1/x.',sol:['(1/x)/1 → 0.']},
+{type:'lim',f:'x^2/e^x',a:'inf',ans:'0',hint:'Два раза.',sol:['2x/eˣ → 2/eˣ → 0.']},
+{type:'lim',f:'x*ln(x)',a:'0+',ans:'0',hint:'ln x/(1/x).',sol:['(1/x)/(−1/x²) = −x → 0.']},
+{type:'lim',f:'x^x',a:'0+',ans:'1',hint:'xˣ = e<sup>x ln x</sup>.',sol:['x ln x → 0 ⇒ e⁰ = 1.']},
+{type:'lim',f:'x^(1/x)',a:'inf',ans:'1',hint:'e<sup>(ln x)/x</sup>.',sol:['(ln x)/x → 0 ⇒ 1.']},
+{type:'lim',f:'ln(x)/(x-1)',a:'1',ans:'1',hint:'(1/x)/1.',sol:['1/x → 1.']},
+{type:'lim',f:'1/x-1/(e^x-1)',a:'0',ans:'1/2',hint:'Общий знаменатель: (eˣ − 1 − x)/(x(eˣ − 1)).',sol:['Знаменатель ~ x². Числитель — см. задачу 2: ~ x²/2. Ответ 1/2.']},
+{type:'lim',f:'(x+sin(x))/x',a:'inf',ans:'1',hint:'Лопиталь тут не работает. Раздели почленно.',sol:['1 + sin x/x → 1 + 0 = 1.']}
+]},
+/* ------------------------------------------------------------ 11 */
+{title:'Сравнение роста и последовательности',lect:'n → ∞',
+theory:[
+`Предел последовательности ${M('a<sub>n</sub>')} при ${M('n → ∞')} ищется теми же методами, что и ${M('x → +∞')}. В калькуляторе можно писать n.`,
+`Шкала роста: ${M('ln n ≪ n<sup>a</sup> ≪ q<sup>n</sup> ≪ n! ≪ n<sup>n</sup>')} (a > 0, q > 1). Отношение «медленного» к «быстрому» → 0.`,
+`Стандартные: ${M('ⁿ√n → 1')}, ${M('ⁿ√a → 1')} (a > 0), ${M(F('qⁿ','n!')+' → 0')}, ${M(F('n!','nⁿ')+' → 0')}, ${M('qⁿ → 0')} при ${M('|q| < 1')}.`,
+`Суммы: ${M('1 + 2 + … + n = '+F('n(n + 1)','2'))}, ${M('1² + … + n² = '+F('n(n + 1)(2n + 1)','6'))}, ${M('1 + q + … + qⁿ⁻¹ = '+F('qⁿ − 1','q − 1'))}.`,
+`Теорема о двух милиционерах: если ${M('aₙ ≤ bₙ ≤ cₙ')} и крайние имеют один предел — средняя тоже. Так доказывают ${M(F('sin n','n')+' → 0')}.`],
+ex:{q:LQ('n→∞',F('2<sup>n+1</sup> + 3<sup>n</sup>','2<sup>n</sup> + 3<sup>n+1</sup>')),steps:['Самое быстрое слагаемое — 3ⁿ. Делим на него.',`${F('2·(2/3)ⁿ + 1','(2/3)ⁿ + 3')} → ${F('0 + 1','0 + 3')} = 1/3.`]},
+probs:[
+{type:'lim',f:'x^2/2^x',a:'inf',q:LQ('n→∞',F('n²','2ⁿ')),ans:'0',hint:'Показательная растёт быстрее степенной.',sol:['0.']},
+{type:'lim',f:'ln(x)/x',a:'inf',q:LQ('n→∞',F('ln n','n')),ans:'0',hint:'Логарифм — самый медленный.',sol:['0.']},
+{type:'lim',f:'x^(1/x)',a:'inf',q:LQ('n→∞','ⁿ√n'),ans:'1',hint:'n<sup>1/n</sup> = e<sup>(ln n)/n</sup>.',sol:['(ln n)/n → 0 ⇒ e⁰ = 1.']},
+{type:'lim',f:'(2^(x+1)+3^x)/(2^x+3^(x+1))',a:'inf',q:LQ('n→∞',F('2<sup>n+1</sup> + 3<sup>n</sup>','2<sup>n</sup> + 3<sup>n+1</sup>')),ans:'1/3',hint:'Пример из разбора.',sol:['1/3.']},
+{type:'lim',f:'(3^x+2^x)/(3^x-2^x)',a:'inf',q:LQ('n→∞',F('3ⁿ + 2ⁿ','3ⁿ − 2ⁿ')),ans:'1',hint:'Делим на 3ⁿ.',sol:['(1 + (2/3)ⁿ)/(1 − (2/3)ⁿ) → 1.']},
+{type:'lim',f:'x*(x+1)/(2x^2)',a:'inf',q:LQ('n→∞',F('1 + 2 + … + n','n²')),ans:'1/2',hint:'Сумма арифметической прогрессии n(n + 1)/2.',sol:['n(n + 1)/(2n²) → 1/2.']},
+{type:'lim',f:'x*(x+1)*(2x+1)/(6x^3)',a:'inf',q:LQ('n→∞',F('1² + 2² + … + n²','n³')),ans:'1/3',hint:'Формула суммы квадратов.',sol:['n(n + 1)(2n + 1)/(6n³) → 2/6 = 1/3.']},
+{type:'lim',f:'sqrt(x^2+x)-x',a:'inf',q:LQ('n→∞','(√(n² + n) − n)'),ans:'1/2',hint:'Сопряжённое.',sol:['n/(√(n² + n) + n) → 1/2.']},
+{type:'choice',q:LQ('n→∞',F('n!','nⁿ')),opts:['0','1','e','∞'],ans:0,hint:'n!/nⁿ = (1/n)(2/n)…(n/n).',sol:['Все множители ≤ 1, первый равен 1/n → 0 ⇒ 0.']},
+{type:'lim',f:'sin(x)/x',a:'inf',q:LQ('n→∞',F('sin n','n')),ans:'0',hint:'Ограниченная / ∞.',sol:['|sin n/n| ≤ 1/n → 0.']}
+]},
+/* ------------------------------------------------------------ 12 */
+{title:'Односторонние пределы, непрерывность, разрывы',lect:'Слева и справа',
+theory:[
+`${M('lim<sub>x→a−0</sub>')} — предел слева (x < a), ${M('lim<sub>x→a+0</sub>')} — справа. Предел существует ⇔ оба односторонних существуют и равны.`,
+`Функция непрерывна в a ⇔ ${M('lim f(x) = f(a)')} (предел есть и совпадает со значением).`,
+`<b>Устранимый разрыв</b>: предел есть, но ≠ f(a) или f(a) не определено (${M(F('x² − 1','x − 1'))} в точке 1).`,
+`<b>Разрыв I рода (скачок)</b>: оба односторонних конечны, но различны (${M(F('|x|','x'))} в 0).`,
+`<b>Разрыв II рода</b>: хотя бы один односторонний бесконечен или не существует (${M(F('1','x'))}, ${M('e<sup>1/x</sup>')} в 0).`,
+`Типичные «двусторонние» функции: ${M('e<sup>1/x</sup>')}: справа ∞, слева 0; ${M('arctg(1/x)')}: справа π/2, слева −π/2.`],
+ex:{q:'Исследовать на разрыв f(x) = e<sup>1/(x−2)</sup> в точке x = 2.',steps:['Справа: 1/(x − 2) → +∞ ⇒ e<sup>+∞</sup> = +∞.','Слева: 1/(x − 2) → −∞ ⇒ e<sup>−∞</sup> = 0.','Один односторонний бесконечен ⇒ разрыв II рода.']},
+probs:[
+{type:'lim',f:'1/(x-2)',a:'2+',ans:'inf',hint:'Знаменатель → +0.',sol:['+∞.']},
+{type:'lim',f:'e^(1/x)',a:'0+',ans:'inf',hint:'1/x → +∞.',sol:['+∞.']},
+{type:'lim',f:'arctg(1/x)',a:'0-',ans:'-pi/2',hint:'1/x → −∞.',sol:['arctg(−∞) = −π/2. Ввод: -pi/2.']},
+{type:'lim',f:'|x-1|/(x-1)',a:'1+',q:LQ('x→1+0',F('|x − 1|','x − 1')),ans:'1',hint:'Справа x − 1 > 0, модуль раскрывается без смены знака.',sol:['(x − 1)/(x − 1) = 1.']},
+{type:'choice',q:`Тип разрыва ${M(F('x² − 1','x − 1'))} в точке x = 1`,opts:['Устранимый','I рода (скачок)','II рода','Разрыва нет'],ans:0,hint:'Посчитай предел.',sol:['Предел = 2, а в точке функция не определена ⇒ устранимый.']},
+{type:'choice',q:`Тип разрыва ${M(F('|x|','x'))} в точке x = 0`,opts:['Устранимый','I рода (скачок)','II рода','Разрыва нет'],ans:1,hint:'Слева −1, справа 1.',sol:['Конечные, но разные ⇒ скачок.']},
+{type:'choice',q:`Тип разрыва ${M('e<sup>1/x</sup>')} в точке x = 0`,opts:['Устранимый','I рода (скачок)','II рода','Разрыва нет'],ans:2,hint:'Справа?',sol:['Справа +∞ ⇒ II рода.']},
+{type:'choice',q:`Тип разрыва ${M('arctg(1/x)')} в точке x = 0`,opts:['Устранимый','I рода (скачок)','II рода','Разрыва нет'],ans:1,hint:'Оба односторонних конечны.',sol:['−π/2 и π/2 ⇒ скачок.']},
+{type:'num',q:`При каком a функция f(x) = ${F('x² − 4','x − 2')} при x ≠ 2, f(2) = a, непрерывна?`,ans:'4',hint:'a должно равняться пределу.',sol:['lim = x + 2 → 4 ⇒ a = 4.']}
+]},
+/* ------------------------------------------------------------ 13 */
+{title:'Пределы через формулу Тейлора',lect:'o-малое',
+theory:[
+`Когда эквивалентностей не хватает (в числителе разность, и главные части сокращаются), раскладываем функции до нужного порядка. При ${M('x → 0')}:`,
+`${M('eˣ = 1 + x + '+F('x²','2')+' + '+F('x³','6')+' + o(x³)')}, ${M('sin x = x − '+F('x³','6')+' + o(x³)')}, ${M('cos x = 1 − '+F('x²','2')+' + '+F('x⁴','24')+' + o(x⁴)')}.`,
+`${M('ln(1 + x) = x − '+F('x²','2')+' + '+F('x³','3')+' + o(x³)')}, ${M('(1 + x)<sup>a</sup> = 1 + ax + '+F('a(a − 1)','2')+'x² + o(x²)')}.`,
+`${M('tg x = x + '+F('x³','3')+' + o(x³)')}, ${M('arctg x = x − '+F('x³','3')+' + o(x³)')}, ${M('arcsin x = x + '+F('x³','6')+' + o(x³)')}.`,
+`Правило порядка: раскладывай до степени знаменателя. Если в знаменателе ${M('x³')} — каждую функцию числителя до ${M('x³')}.`],
+ex:{q:LQ('x→0',F('sin x − x cos x','x³')),steps:['sin x = x − x³/6 + o(x³), x cos x = x − x³/2 + o(x³).','Разность: x³/2 − x³/6 = x³/3.','Ответ: 1/3.']},
+probs:[
+{type:'lim',f:'(e^x-1-x-x^2/2)/x^3',a:'0',ans:'1/6',hint:'Остаётся член x³/6.',sol:['1/6.']},
+{type:'lim',f:'(cos(x)-1+x^2/2)/x^4',a:'0',ans:'1/24',hint:'Член x⁴/24.',sol:['1/24.']},
+{type:'lim',f:'(ln(1+x)-x)/x^2',a:'0',ans:'-1/2',hint:'ln(1 + x) − x = −x²/2 + …',sol:['−1/2.']},
+{type:'lim',f:'(tg(x)-x)/x^3',a:'0',ans:'1/3',hint:'tg x = x + x³/3 + …',sol:['1/3.']},
+{type:'lim',f:'(sin(x)-x*cos(x))/x^3',a:'0',ans:'1/3',hint:'Пример из разбора.',sol:['1/3.']},
+{type:'lim',f:'(e^x-1-sin(x))/x^2',a:'0',ans:'1/2',hint:'До x²: eˣ − 1 = x + x²/2, sin x = x.',sol:['x²/2 : x² = 1/2.']},
+{type:'lim',f:'(arctg(x)-x)/x^3',a:'0',ans:'-1/3',hint:'arctg x = x − x³/3 + …',sol:['−1/3.']},
+{type:'lim',f:'(sqrt(1+2x)-1-x)/x^2',a:'0',ans:'-1/2',hint:'(1 + 2x)<sup>1/2</sup> = 1 + x − x²/2 + …',sol:['a = 1/2: ½ · (−½)/2 · (2x)² = −x²/2 ⇒ −1/2.']},
+{type:'lim',f:'(x-ln(1+x))/x^2',a:'0',ans:'1/2',hint:'x − (x − x²/2) = x²/2.',sol:['1/2.']}
+]},
+/* ------------------------------------------------------------ 14 */
+{title:'Сборная: задачи экзаменационного уровня',lect:'Финал',
+theory:[
+`Всё вперемешку. Перед каждой задачей: подставь → определи тип → выбери метод. Часто удобно комбинировать: сначала упростить, потом эквивалентности, и только если не выходит — Лопиталь.`,
+`Проверка: подставь в функцию x очень близко к точке (например, a + 0,001) или очень большое x и сравни с ответом.`,
+`Для любого предела можно открыть «Калькулятор с решением» в меню — он определит тип неопределённости и покажет все шаги.`],
+ex:{q:LQ('x→0','('+F('sin x','x')+')<sup>1/x²</sup>'),steps:['1<sup>∞</sup>: показатель (sin x/x − 1)/x² = (sin x − x)/x³.','sin x − x ~ −x³/6 ⇒ показатель → −1/6.','Ответ e<sup>−1/6</sup>.']},
+probs:[
+{type:'lim',f:'((x^2+1)/(x^2-1))^(x^2)',a:'inf',ans:'e^2',hint:'1^∞.',sol:['e².']},
+{type:'lim',f:'(1-cos(2x))/(x*arcsin(3x))',a:'0',ans:'2/3',hint:'1 − cos 2x ~ 2x².',sol:['2x²/(3x²) = 2/3.']},
+{type:'lim',f:'sqrt(x^2+4x)-x',a:'inf',ans:'2',hint:'p/2.',sol:['4x/(√(x² + 4x) + x) → 2.']},
+{type:'lim',f:'(e^(2x)-e^x)/sin(3x)',a:'0',ans:'1/3',hint:'e<sup>2x</sup> − eˣ = eˣ(eˣ − 1).',sol:['eˣ(eˣ − 1) ~ 1 · x ⇒ x/(3x) = 1/3.']},
+{type:'lim',f:'(x-ln(1+x))/x^2',a:'0',ans:'1/2',hint:'Тейлор или Лопиталь.',sol:['1/2.']},
+{type:'lim',f:'(1+tg(x))^ctg(x)',a:'0',q:LQ('x→0','(1 + tg x)<sup>ctg x</sup>'),ans:'e',hint:'(A − 1)B = tg x · ctg x = 1.',sol:['e.']},
+{type:'lim',f:'ln(1+3x+x^2)/ln(1+2x)',a:'0',ans:'3/2',hint:'ln(1 + u) ~ u.',sol:['(3x + x²)/(2x) → 3/2.']},
+{type:'lim',f:'x*(e^(1/x)-1)',a:'inf',ans:'1',hint:'u = 1/x → 0.',sol:['x · (1/x) = 1.']},
+{type:'lim',f:'(3^x-2^x)/(4^x-3^x)',a:'0',ans:'ln(3/2)/ln(4/3)',hint:'aˣ − bˣ = bˣ((a/b)ˣ − 1) ~ x ln(a/b).',sol:['x ln(3/2) / (x ln(4/3)). Ввод: ln(1.5)/ln(4/3).']},
+{type:'lim',f:'(sin(x)/x)^(1/x^2)',a:'0',ans:'e^(-1/6)',hint:'Пример из разбора.',sol:['e<sup>−1/6</sup>.']}
+]}
+];
+if(typeof module!=='undefined')module.exports={TOPICS};
+
+</script>
+<script>
+/* ---------- ввод ответа: числа, ∞, «не существует» ---------- */
+function normAns(s){return String(s).trim().toLowerCase().replace(/\s+/g,'').replace(/^.*=/,'')}
+function parseAnswer(s){
+  const t=normAns(s);
+  if(/^(нет|несуществует|нс|none|dne|-)$/.test(t))return {none:true};
+  return {v:DX.ev(DX.parse(t.replace(/^\+/,'')),{})};
+}
+function checkAnswer(P,input){
+  const u=parseAnswer(input);if(u.none)return false;
+  const e=DX.ev(DX.parse(P.ans),{});
+  if(!Number.isFinite(e))return u.v===e;
+  return Number.isFinite(u.v)&&Math.abs(u.v-e)<=1e-6*Math.max(1,Math.abs(e));
+}
+function limQ(f,a){const T=LIM.parseTarget(a);return LIM.headHTML(DX.parse(f),T,T.side)}
+function autoSteps(P){const r=LIM.solve(P.f,P.a);return LIM.itemsHTML(r.steps)}
+
+/* ---------- прогресс ---------- */
+const KEY='limits-progress-v1';
+let done={};
+try{done=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){done={}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}};
+const key=(t,i)=>`${t}-${i}`;
+const total=TOPICS.reduce((s,T)=>s+T.probs.length,0);
+const solvedIn=t=>TOPICS[t].probs.filter((_,i)=>done[key(t,i)]).length;
+
+const state={mode:'topic',t:0,tab:'theory',i:0,exam:null,calc:{src:'',a:'0'},gen:{lvl:2,cur:null,streak:0,solved:0}};
+const $=s=>document.querySelector(s);
+const main=$('#main');
+
+TOPICS.forEach(T=>T.probs.forEach(P=>{if(P.type==='lim'&&!P.q)P.q=limQ(P.f,P.a);if(P.type==='lim')P.lab='Ответ:'}));
+
+function renderNav(){
+  $('#nav').innerHTML=TOPICS.map((T,t)=>{const s=solvedIn(t),n=T.probs.length;
+    return `<li><button data-t="${t}" aria-current="${state.mode==='topic'&&state.t===t}"><span class="n">${t+1}</span><span>${T.title}</span><span class="c ${s===n?'done':''}">${s}/${n}</span></button></li>`}).join('');
+  $('#mob').innerHTML=`<option value="calc" ${state.mode==='calc'?'selected':''}>Калькулятор с решением</option><option value="gen" ${state.mode==='gen'?'selected':''}>Генератор задач</option>`+
+    TOPICS.map((T,t)=>`<option value="${t}" ${state.mode==='topic'&&state.t===t?'selected':''}>${t+1}. ${T.title.replace(/<[^>]+>/g,'')} (${solvedIn(t)}/${T.probs.length})</option>`).join('');
+  document.querySelectorAll('.tools button').forEach(b=>b.setAttribute('aria-current',String(state.mode===b.dataset.mode)));
+  const all=Object.keys(done).filter(k=>done[k]).length;
+  $('#ovText').textContent=`Решено ${all} из ${total}`;
+  $('#ovBar').style.width=(100*all/total)+'%';
+}
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-t]');if(b)openTopic(+b.dataset.t)});
+$('#mob').addEventListener('change',e=>{const v=e.target.value;if(v==='calc'||v==='gen')openMode(v);else openTopic(+v)});
+document.querySelectorAll('.tools button').forEach(b=>b.onclick=()=>openMode(b.dataset.mode));
+function openTopic(t){state.mode='topic';state.t=t;state.tab='theory';state.i=0;render();main.scrollIntoView({block:'start'})}
+function openMode(m){state.mode=m;render();main.scrollIntoView({block:'start'})}
+function render(){renderNav();({exam:renderExam,calc:renderCalc,gen:renderGen,topic:renderTopic})[state.mode]()}
+
+function renderTopic(){
+  const T=TOPICS[state.t];
+  const tabs=[['theory','Теория'],['ex','Разбор примера'],['prac','Практика']];
+  main.innerHTML=`<div class="lect">${T.lect} · тема ${state.t+1} из ${TOPICS.length}</div><h2>${T.title}</h2>
+  <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${state.tab===k}">${l}</button>`).join('')}</div><div id="body"></div>`;
+  main.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;renderTopic()});
+  const body=$('#body');
+  if(state.tab==='theory'){
+    body.innerHTML=`<ul class="theory">${T.theory.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="navrow"><span></span><button class="btn primary" id="toEx">К разбору примера</button></div>`;
+    $('#toEx').onclick=()=>{state.tab='ex';renderTopic()};
+  }else if(state.tab==='ex'){
+    body.innerHTML=`<div class="q">${T.ex.q}</div><div class="steps"><ol>${T.ex.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div>
+    <div class="navrow"><span></span><button class="btn primary" id="toPr">Решать задачи</button></div>`;
+    $('#toPr').onclick=()=>{state.tab='prac';renderTopic()};
+  }else{
+    body.innerHTML=`<div class="dots">${T.probs.map((_,i)=>`<button data-i="${i}" class="${done[key(state.t,i)]?'ok':''}" aria-current="${i===state.i}" aria-label="Задача ${i+1}">${i+1}</button>`).join('')}</div><div id="card"></div>
+    <div class="navrow"><button class="btn ghost" id="prev" ${state.i===0?'disabled':''}>Предыдущая</button>
+    <button class="btn" id="next">${state.i<T.probs.length-1?'Следующая задача':(state.t<TOPICS.length-1?'Следующая тема':'К контрольной')}</button></div>`;
+    body.querySelectorAll('.dots button').forEach(b=>b.onclick=()=>{state.i=+b.dataset.i;renderTopic()});
+    $('#prev').onclick=()=>{state.i--;renderTopic()};
+    $('#next').onclick=()=>{if(state.i<T.probs.length-1){state.i++;renderTopic()}else if(state.t<TOPICS.length-1){openTopic(state.t+1)}else startExam()};
+    renderProblem($('#card'),T.probs[state.i],{label:`Задача ${state.i+1}`,onResult:ok=>{if(ok){done[key(state.t,state.i)]=true;save();renderNav();
+      const d=body.querySelector(`.dots button[data-i="${state.i}"]`);if(d)d.classList.add('ok')}}});
+  }
+}
+
+/* ---------- кнопки ввода (@ — место курсора) ---------- */
+const KEYS=[
+  {k:'(@)/()',l:F('▢','▢'),t:'Дробь (выдели текст — он станет числителем)'},
+  {k:'^2@',l:'x²'},{k:'^(@)',l:'xⁿ'},{k:'sqrt(@)',l:'√'},{k:'(@)',l:'( )'},
+  {k:'*',l:'·'},{k:'/',l:'/'},{k:'+',l:'+'},{k:'-',l:'−'},
+  {k:'x',l:'x'},{k:'π',l:'π'},{k:'e',l:'e'},{k:'e^(@)',l:'eˣ'},{k:'ln(@)',l:'ln'},
+  {k:'sin(@)',l:'sin'},{k:'cos(@)',l:'cos'},{k:'tg(@)',l:'tg'},{k:'arctg(@)',l:'arctg'},{k:'∞',l:'∞'}];
+function keysHTML(list=KEYS){return `<div class="keys">${list.map(o=>`<button data-k="${o.k.replace(/"/g,'&quot;')}" type="button"${o.t?` title="${o.t}"`:''}>${o.l}</button>`).join('')}</div>`}
+function bindKeys(el,inp,after){
+  el.querySelectorAll('[data-k]').forEach(b=>{
+    b.addEventListener('mousedown',e=>e.preventDefault());
+    b.onclick=()=>{
+      let k=b.dataset.k;const s=inp.selectionStart??inp.value.length,e2=inp.selectionEnd??s;const sel=inp.value.slice(s,e2);
+      let caret=k.indexOf('@');
+      if(caret<0)caret=k.length;
+      else if(sel){k=k.replace('@',sel);const nxt=k.indexOf('()',caret+sel.length);caret=nxt>=0?nxt+1:k.length}
+      else k=k.replace('@','');
+      inp.value=inp.value.slice(0,s)+k+inp.value.slice(e2);inp.focus();inp.setSelectionRange(s+caret,s+caret);
+      inp.dispatchEvent(new Event('input'));after&&after();
+    };
+  });
+}
+function livePreview(inp,box,prefix,isAnswer){
+  const upd=()=>{const v=inp.value.trim();if(!v){box.className='preview';box.innerHTML='';return}
+    try{
+      if(isAnswer){const t=normAns(v);if(/^(нет|несуществует|нс|none|dne)$/.test(t)){box.className='preview';box.innerHTML='<span class="lbl">читаю как</span>не существует';return}
+        const N=DX.parse(t.replace(/^\+/,''));const val=DX.ev(N,{});
+        box.className='preview';box.innerHTML=`<span class="lbl">читаю как</span>${prefix}${val===Infinity?'+∞':val===-Infinity?'−∞':DX.R(N)}${Number.isFinite(val)&&DX.R(N).match(/[a-zπ√]/i)?` <span class="lbl">≈ ${(+val.toPrecision(6)).toString().replace('.',',')}</span>`:''}`;return}
+      const N=DX.parse(v);box.className='preview';box.innerHTML=`<span class="lbl">читаю как</span>${prefix}${DX.R(N)}`}
+    catch(e){box.className='preview err';box.textContent=e.message}};
+  inp.addEventListener('input',upd);return upd;
+}
+const ANS_HELP='Ответ — число: 3/5, -1/4, e^2, 1/e, sqrt(3)/2, ln(2), pi/4. Бесконечность: inf или ∞ (−∞: -inf). Пробелы важны: - 5/x — минус перед всей дробью.';
+function renderProblem(el,P,opt){
+  let html=`<div class="lect">${opt.label}</div><div class="q">${P.q}</div>`;
+  if(P.type==='choice'){
+    html+=`<div class="choices">${P.opts.map((o,i)=>`<button data-c="${i}">${o}</button>`).join('')}</div>`;
+  }else{
+    html+=`<div class="ansrow"><label for="ans">${P.type==='lim'?'= ':'Ответ:'}</label><input class="ans" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="например 3/5, e^2, inf"><button class="btn primary" id="chk">Проверить</button></div>
+    <div class="preview" id="pv"></div>${keysHTML()}<div class="help">${ANS_HELP}</div>`;
+  }
+  html+=`<div class="fb" id="fb"></div><div class="actions">${opt.exam?'':`<button class="btn ghost" id="hintB">Подсказка</button>`}<button class="btn ghost" id="solB" ${opt.exam?'hidden':''}>Показать решение</button>${P.type==='lim'&&!opt.exam?'<button class="btn ghost" id="autoB">Пошаговый разбор (авто)</button>':''}</div><div id="extra"></div>`;
+  el.innerHTML=html;
+  const fb=el.querySelector('#fb'),extra=el.querySelector('#extra');
+  let answered=false;
+  const showSol=()=>{if(!extra.querySelector('.sol'))extra.insertAdjacentHTML('beforeend',`<div class="panel sol"><h4>Решение</h4><div class="steps"><ol>${P.sol.map(s=>`<li>${s}</li>`).join('')}</ol></div></div>`)};
+  const finish=ok=>{
+    fb.className='fb '+(ok?'ok':'bad');
+    if(opt.exam){if(answered)return;answered=true;fb.textContent=ok?'Верно.':'Неверно. Правильный ответ: '+(P.type==='choice'?P.opts[P.ans].replace(/<[^>]+>/g,''):P.ans.replace('inf','∞'));showSol();opt.onResult(ok);return}
+    fb.textContent=ok?'Верно! Можно идти дальше.':'Пока не совпадает. Попробуй ещё раз или открой подсказку.';
+    opt.onResult(ok);
+  };
+  if(P.type==='choice'){
+    el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{
+      if(opt.exam&&answered)return;
+      const i=+b.dataset.c,ok=i===P.ans;b.classList.add(ok?'right':'wrong');
+      if(opt.exam){el.querySelector(`[data-c="${P.ans}"]`).classList.add('right');el.querySelectorAll('[data-c]').forEach(x=>x.disabled=true)}
+      finish(ok);
+    });
+  }else{
+    const inp=el.querySelector('#ans');
+    const upd=livePreview(inp,el.querySelector('#pv'),'',true);
+    const run=()=>{
+      if(opt.exam&&answered)return;
+      const v=inp.value.trim();if(!v){fb.className='fb bad';fb.textContent='Введи ответ.';return}
+      let ok;try{ok=checkAnswer(P,v)}catch(e){fb.className='fb bad';fb.textContent='Не получилось прочитать ответ: '+e.message;return}
+      if(opt.exam){inp.disabled=true;el.querySelector('#chk').disabled=true}
+      finish(ok);
+    };
+    el.querySelector('#chk').onclick=run;inp.addEventListener('keydown',e=>{if(e.key==='Enter')run()});
+    bindKeys(el,inp,upd);
+  }
+  const hb=el.querySelector('#hintB');
+  if(hb)hb.onclick=()=>{if(!extra.querySelector('.hint'))extra.insertAdjacentHTML('afterbegin',`<div class="panel hint"><h4>Подсказка</h4>${P.hint}</div>`)};
+  el.querySelector('#solB').onclick=showSol;
+  const ab=el.querySelector('#autoB');
+  if(ab)ab.onclick=()=>{if(!extra.querySelector('.auto'))extra.insertAdjacentHTML('beforeend',`<div class="panel auto"><h4>Пошаговый разбор (сделан автоматически)</h4><div class="steps">${autoSteps(P)}</div></div>`)};
+}
+
+/* ---------- калькулятор ---------- */
+const EXAMPLES=[['(x^2-5x+6)/(x^2-4)','2'],['(sqrt(x+3)-2)/(x-1)','1'],['sin(3x)/tg(5x)','0'],['(3x^2-x)/(5x^2+4)','∞'],['sqrt(x^2+3x)-x','∞'],['((x+3)/(x-1))^x','∞'],
+  ['(1-cos(x))/x^2','0'],['(x-sin(x))/x^3','0'],['x*ln(x)','0+'],['x^x','0+'],['1/x-1/sin(x)','0'],['e^(1/x)','0'],['(cos(x))^(1/x^2)','0'],['(2^n+3^n)/(3^n+1)','∞']];
+function renderCalc(){
+  const C=state.calc;
+  main.innerHTML=`<div class="lect">Инструмент</div><h2>Калькулятор пределов с решением</h2>
+  <p class="sub" style="margin-top:-6px">Введи функцию и точку — калькулятор определит тип неопределённости, выберет метод (разложение, сопряжённое, старшая степень, эквивалентности, замечательные пределы, Лопиталь) и покажет каждый шаг.</p>
+  <div class="ansrow" style="margin-top:16px"><label>lim</label><input class="ans" id="fx" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="например (sqrt(x+3)-2)/(x-1)" value="${C.src.replace(/"/g,'&quot;')}"></div>
+  <div class="ansrow" style="margin-top:10px"><label for="a0">x →</label><input class="ans small" id="a0" autocomplete="off" value="${C.a}" placeholder="0, 2, ∞, -∞, 0+, 1-">
+    <div class="seg" id="qa">${['0','1','∞','−∞','0+','0−'].map(v=>`<button data-a="${v}">${v}</button>`).join('')}</div>
+    <button class="btn primary" id="go">Найти предел</button></div>
+  <div class="preview" id="pv"></div>
+  ${keysHTML()}
+  <div class="chips" style="margin-top:14px"><span class="stat" style="margin-right:4px">Примеры:</span>${EXAMPLES.map(([f,a])=>`<button data-ex="${f}" data-a="${a}">${limQ(f,a.replace('∞','inf'))}</button>`).join('')}</div>
+  <div class="help">Точка: число (2, -1, pi/2), ∞ или inf, -∞, односторонний предел — 0+ (справа) или 1- (слева). Для последовательностей можно писать n. Корень — sqrt(…), модуль |x|, eˣ — e^x. Умножение без знака сильнее деления: 1/2x = 1/(2x), а через пробел — слабее: 1/2 x = x/2. Строка «читаю как» показывает, как понята запись.</div>
+  <div id="out"></div>`;
+  const inp=$('#fx'),a0=$('#a0');
+  const upd=()=>{const box=$('#pv');const v=inp.value.trim();if(!v){box.innerHTML='';return}
+    try{const T=LIM.parseTarget(a0.value||'0');box.className='preview';box.innerHTML=`<span class="lbl">читаю как</span>${LIM.headHTML(DX.parse(v),T,T.side)}`}
+    catch(e){box.className='preview err';box.textContent=e.message}};
+  inp.addEventListener('input',upd);a0.addEventListener('input',upd);upd();
+  bindKeys(main,inp,upd);
+  const go=()=>{C.src=inp.value.trim();C.a=a0.value.trim()||'0';calcRun()};
+  $('#go').onclick=go;[inp,a0].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')go()}));
+  main.querySelectorAll('#qa button').forEach(b=>b.onclick=()=>{a0.value=b.dataset.a.replace('−','-');upd();if(inp.value.trim())go()});
+  main.querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.ex;a0.value=b.dataset.a;upd();go()});
+  if(C.src)calcRun();
+}
+function fmtNum(v){if(v===Infinity)return '+∞';if(v===-Infinity)return '−∞';if(!Number.isFinite(v))return '—';return (+v.toPrecision(7)).toString().replace('.',',').replace('-','−')}
+function calcRun(){
+  const C=state.calc,out=$('#out');
+  if(!C.src){out.innerHTML='';return}
+  let r;
+  try{r=LIM.solve(C.src,C.a.replace(/∞/g,'inf').replace(/−/g,'-'))}catch(e){out.innerHTML=`<p class="fb bad">${e.message}</p>`;return}
+  const head=LIM.headHTML(r.F,r.T,r.side);
+  const ansTxt=r.split?`не существует <span class="stat">(слева ${LIM.LH(r.split.left)}, справа ${LIM.LH(r.split.right)})</span>`:LIM.LH(r.L);
+  const fail=r.L.k==='fail';
+  out.innerHTML=`<h3>Ответ</h3><div class="answer"${fail||!r.verified?' style="border-color:var(--bad)"':''}><div class="big">${head} = ${fail?'?':ansTxt}</div>
+    ${r.L.k==='fin'?`<div class="plain">≈ ${fmtNum(r.L.v)}</div>`:''}
+    <div class="plain">${fail?'Автоматически раскрыть не получилось. Численная оценка: '+fmtNum(r.numeric):r.verified?'Проверено численно: значения функции вблизи точки действительно стремятся к ответу.':'Внимание: численная проверка не подтвердила ответ, оценка ≈ '+fmtNum(r.numeric)+'. Проверь запись функции.'}</div></div>
+    <h3>Решение по шагам</h3><div class="steps">${LIM.itemsHTML(r.steps)}</div>
+    <h3>Проверить свой ответ</h3>
+    <div class="ansrow"><label for="mine">=</label><input class="ans" id="mine" autocomplete="off" spellcheck="false" placeholder="твой ответ: 1/4, e^2, inf, нет"><button class="btn" id="cmp">Сравнить</button></div>
+    <div class="preview" id="pv2"></div><div class="fb" id="fb2"></div>`;
+  const mine=$('#mine');livePreview(mine,$('#pv2'),'',true);
+  const cmp=()=>{const fb=$('#fb2');try{const u=parseAnswer(mine.value);let ok;
+      if(u.none)ok=r.L.k==='none'||r.L.k==='bnd';
+      else if(r.L.k==='fin')ok=Number.isFinite(u.v)&&Math.abs(u.v-r.L.v)<1e-6*Math.max(1,Math.abs(r.L.v));
+      else if(r.L.k==='pinf')ok=u.v===Infinity;else if(r.L.k==='minf')ok=u.v===-Infinity;else ok=false;
+      fb.className='fb '+(ok?'ok':'bad');fb.textContent=ok?'Совпадает — ответ верный.':'Не совпадает. Сравни с решением выше.'}catch(e){fb.className='fb bad';fb.textContent=e.message}};
+  $('#cmp').onclick=cmp;mine.addEventListener('keydown',e=>{if(e.key==='Enter')cmp()});
+}
+
+/* ---------- генератор ---------- */
+const RI=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const RN=(a,b)=>{let v;do{v=RI(a,b)}while(v===0);return v};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const sgn=v=>v<0?`-${-v}`:`+${v}`;
+const lin=(k,b)=>`${k===1?'':k===-1?'-':k}x${b?sgn(b):''}`;
+const quad=(r1,r2)=>`x^2${sgn(-(r1+r2)).replace(/^\+0$/,'')}x${sgn(r1*r2)}`.replace('+0x','').replace('-0x','').replace(/\+0$/,'');
+const GEN=[
+ // уровень 1
+ [()=>{const a=RN(-4,5),b=RN(-5,5),c=RN(-5,5);if(b===a||c===a||b===c)return null;return {f:`(${quad(a,b)})/(${quad(a,c)})`,a:String(a),tag:'0/0, разложение'}},
+  ()=>{const p=RI(1,3),q=RI(1,3),A=RN(-6,6),B=RN(1,7);return {f:`(${A}x^${p}${sgn(RN(-5,5))}x+${RI(1,5)})/(${B}x^${q}${sgn(RN(-6,6))})`,a:'inf',tag:'∞/∞'}},
+  ()=>{const k=RN(2,9),m=RN(2,9);return {f:`${pick(['sin','tg','arcsin','arctg'])}(${k}x)/${pick(['x',`${pick(['sin','tg'])}(${m}x)`])}`,a:'0',tag:'первый замечательный'}},
+  ()=>{const k=RN(1,5),m=RN(1,4);return {f:`(1${sgn(k)}/x)^(${m}x)`,a:'inf',tag:'второй замечательный'}},
+  ()=>{const a=RN(-5,5);return {f:`(x^2-${a*a})/(x${sgn(-a)})`,a:String(a),tag:'0/0, разность квадратов'}}],
+ // уровень 2
+ [()=>{const a=RI(0,6),d=RI(2,4);const c=d*d-a;return {f:`(sqrt(x${sgn(c)})-${d})/(x${sgn(-a)})`.replace('x+0','x').replace('x-0','x'),a:String(a),tag:'сопряжённое'}},
+  ()=>{const p=RN(-6,8),q=RI(-5,5);return {f:`sqrt(x^2${sgn(p)}x${q?sgn(q):''})-x`,a:'inf',tag:'∞−∞, сопряжённое'}},
+  ()=>{const k=RN(1,5),m=RN(1,5);return {f:pick([`(e^(${k}x)-1)/sin(${m}x)`,`ln(1+${k}x)/tg(${m}x)`,`(1-cos(${k}x))/x^2`,`(1-cos(${k}x))/(x*sin(${m}x))`,`arctg(${k}x^2)/(1-cos(${m}x))`,`(${RI(2,5)}^x-1)/x`]),a:'0',tag:'эквивалентности'}},
+  ()=>{const a=RN(-4,5),b=RN(-4,5);if(a===b)return null;return {f:`((x${sgn(a)})/(x${sgn(b)}))^x`,a:'inf',tag:'1^∞'}},
+  ()=>{const k=RN(1,4);return {f:pick([`(1${sgn(k)}x)^(1/x)`,`(1+sin(${k}x))^(1/x)`,`cos(${k}x)^(1/x^2)`]),a:'0',tag:'1^∞'}},
+  ()=>{const a=RN(1,4);return {f:`1/(x-${a})-${2*a}/(x^2-${a*a})`,a:String(a),tag:'∞−∞, общий знаменатель'}}],
+ // уровень 3
+ [()=>({f:pick(['(x-sin(x))/x^3','(e^x-1-x)/x^2','(tg(x)-sin(x))/x^3','(tg(x)-x)/x^3','(ln(1+x)-x)/x^2','(sin(x)-x*cos(x))/x^3','(e^x-1-sin(x))/x^2','(x-arctg(x))/x^3']),a:'0',tag:'Лопиталь / Тейлор'}),
+  ()=>({f:pick(['x*ln(x)','x^x','x^sin(x)',`x^${RI(2,3)}*ln(x)`]),a:'0+',tag:'0·∞, 0⁰'}),
+  ()=>({f:pick([`x^${RI(2,4)}/e^x`,`ln(x)/x^(1/${RI(2,3)})`,`x^(1/x)`,`(ln(x))^2/x`,`x*(e^(1/x)-1)`,`x*ln(1+${RI(2,5)}/x)`]),a:'inf',tag:'сравнение роста'}),
+  ()=>{const k=RN(1,3);return {f:pick([`1/x-1/sin(x)`,`1/x-1/(e^x-1)`,`ctg(x)-1/x`,`1/(${k}x)-1/tg(${k}x)`]),a:'0',tag:'∞−∞'}},
+  ()=>({f:pick(['(sin(x)/x)^(1/x^2)','(1+tg(x))^ctg(x)','(cos(x))^ctg(x)^2',`((x^2+${RI(1,3)})/(x^2-1))^(x^2)`]),a:pick(['0']),tag:'1^∞'}),
+  ()=>{const a=RI(2,5),b=a+RI(1,3);return {f:`(${b}^x-${a}^x)/x`,a:'0',tag:'эквивалентности'}}]
+];
+function makeGen(lvl){
+  for(let k=0;k<200;k++){
+    const g=pick(GEN[lvl-1])();if(!g)continue;
+    let r;try{r=LIM.solve(g.f,g.a)}catch(e){continue}
+    if(r.L.k!=='fin'&&r.L.k!=='pinf'&&r.L.k!=='minf')continue;
+    if(!r.verified)continue;
+    if(r.L.k==='fin'&&r.L.v===0&&lvl>1&&Math.random()<0.6)continue;
+    if(r.L.k==='fin'&&DX.R(r.L.N,'text').length>40)continue;
+    return {...g,res:r,q:limQ(g.f,g.a)};
+  }
+  return makeGen(1);
+}
+function renderGen(){
+  const G=state.gen;if(!G.cur)G.cur=makeGen(G.lvl);
+  const P=G.cur;
+  main.innerHTML=`<div class="lect">Бесконечная практика</div><h2>Генератор задач</h2>
+  <div class="row" style="margin-top:-4px"><span class="stat">Уровень:</span><div class="seg" id="lv">${[['1','простой'],['2','средний'],['3','сложный']].map(([k,l])=>`<button data-l="${k}" aria-pressed="${G.lvl===+k}" style="font-family:'Golos Text',sans-serif;font-size:14px">${l}</button>`).join('')}</div>
+  <span class="stat">Решено подряд: <b id="st">${G.streak}</b> · всего: <b id="sv">${G.solved}</b></span></div>
+  <div id="card" style="margin-top:18px"></div>
+  <div class="navrow"><span></span><button class="btn primary" id="nx">Новая задача</button></div>`;
+  main.querySelectorAll('#lv button').forEach(b=>b.onclick=()=>{G.lvl=+b.dataset.l;G.cur=makeGen(G.lvl);renderGen()});
+  $('#nx').onclick=()=>{G.cur=makeGen(G.lvl);renderGen()};
+  const card=$('#card');
+  card.innerHTML=`<div class="lect">Найди предел</div><div class="q">${P.q}</div>
+    <div class="ansrow"><label for="ans">=</label><input class="ans" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="3/5, e^2, inf…"><button class="btn primary" id="chk">Проверить</button></div>
+    <div class="preview" id="pv"></div>${keysHTML()}<div class="help">${ANS_HELP}</div>
+    <div class="fb" id="fb"></div>
+    <div class="actions"><button class="btn ghost" id="hintB">Какой тип и метод?</button><button class="btn ghost" id="solB">Показать решение</button></div><div id="extra"></div>`;
+  const inp=$('#ans'),fb=$('#fb'),extra=$('#extra');const upd=livePreview(inp,$('#pv'),'',true);bindKeys(card,inp,upd);
+  let counted=false,peeked=false;const L=P.res.L;
+  const run=()=>{const v=inp.value.trim();if(!v){fb.className='fb bad';fb.textContent='Введи ответ.';return}
+    let ok;try{const u=parseAnswer(v);ok=!u.none&&(L.k==='fin'?Number.isFinite(u.v)&&Math.abs(u.v-L.v)<1e-6*Math.max(1,Math.abs(L.v)):L.k==='pinf'?u.v===Infinity:u.v===-Infinity)}catch(e){fb.className='fb bad';fb.textContent=e.message;return}
+    fb.className='fb '+(ok?'ok':'bad');
+    if(ok){fb.textContent=peeked?'Верно (после просмотра решения в серию не идёт).':'Верно! Жми «Новая задача».';if(!counted){counted=true;G.solved++;G.streak=peeked?0:G.streak+1;$('#st').textContent=G.streak;$('#sv').textContent=G.solved}}
+    else{fb.textContent='Не совпадает.';G.streak=0;$('#st').textContent=0}};
+  $('#chk').onclick=run;inp.addEventListener('keydown',e=>{if(e.key==='Enter')run()});
+  $('#hintB').onclick=()=>{if(extra.querySelector('.hint'))return;const st=P.res.steps[0];extra.insertAdjacentHTML('afterbegin',`<div class="panel hint"><h4>С чего начать</h4><p>Тема: ${P.tag}.</p><div class="steps"><ol><li>${st.text}</li></ol></div></div>`)};
+  $('#solB').onclick=()=>{peeked=true;if(extra.querySelector('.auto'))return;extra.insertAdjacentHTML('beforeend',`<div class="panel auto"><h4>Решение</h4><div class="steps">${LIM.itemsHTML(P.res.steps)}</div></div>`)};
+}
+
+/* ---------- контрольная ---------- */
+function startExam(){
+  const pool=[];TOPICS.forEach((T,t)=>T.probs.forEach((_,i)=>pool.push({t,i})));
+  for(let k=pool.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[pool[k],pool[j]]=[pool[j],pool[k]]}
+  state.mode='exam';state.exam={list:pool.slice(0,10),idx:0,res:[]};render();main.scrollIntoView({block:'start'});
+}
+function renderExam(){
+  const X=state.exam;
+  if(X.idx>=X.list.length){
+    const score=X.res.filter(Boolean).length;
+    const weak=[...new Set(X.list.filter((_,k)=>!X.res[k]).map(o=>o.t))];
+    main.innerHTML=`<div class="lect">Контрольная завершена</div><h2>Результат</h2><div class="result">${score} / ${X.list.length}</div>
+    ${weak.length?`<p>Стоит повторить:</p><ul class="theory">${weak.map(t=>`<li><a href="#" data-t="${t}">${TOPICS[t].title}</a></li>`).join('')}</ul>`:'<p>Ошибок нет — отличная подготовка.</p>'}
+    <div class="actions"><button class="btn primary" id="again">Новая контрольная</button><button class="btn ghost" id="back">К темам</button></div>`;
+    main.querySelectorAll('a[data-t]').forEach(a=>a.onclick=e=>{e.preventDefault();openTopic(+a.dataset.t)});
+    $('#again').onclick=startExam;$('#back').onclick=()=>openTopic(state.t);
+    return;
+  }
+  const {t,i}=X.list[X.idx];
+  main.innerHTML=`<div class="lect">Контрольная · одна попытка на задачу, без подсказок</div><h2>Задача ${X.idx+1} из ${X.list.length}</h2><div id="card"></div>
+  <div class="navrow"><button class="btn ghost" id="quit">Выйти</button><button class="btn primary" id="nx" disabled>${X.idx<X.list.length-1?'Дальше':'Посмотреть результат'}</button></div>`;
+  renderProblem($('#card'),TOPICS[t].probs[i],{exam:true,label:TOPICS[t].title,onResult:ok=>{X.res[X.idx]=ok;if(ok){done[key(t,i)]=true;save();renderNav()}$('#nx').disabled=false}});
+  $('#nx').onclick=()=>{X.idx++;renderExam()};
+  $('#quit').onclick=()=>openTopic(state.t);
+}
+$('#examBtn').onclick=startExam;
+$('#resetBtn').onclick=()=>{if(confirm('Сбросить отметки о решённых задачах?')){done={};save();render()}};
+render();
+
+</script>
+<!-- Training: подвал и общий скрипт сайта -->
+<footer class="sitefoot">
+  <span><a href="index.html">Training</a> · <a href="index.html#materials">Все материалы</a> · <a href="index.html#about">О сайте</a></span>
+  <span>Сделал <a href="https://github.com/Xtop1337" target="_blank" rel="noopener">Xtop1337</a> · <a href="https://github.com/Xtop1337/Training" target="_blank" rel="noopener">исходный код</a></span>
+</footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

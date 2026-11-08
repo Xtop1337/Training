@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Training</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Тренажёры по матанализу: пределы, производные и интегралы. Теория, задачи с проверкой, калькуляторы с пошаговым решением и шпаргалки в PDF.">
+<meta name="theme-color" content="#E8EDF7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#080C1B" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/glass.css">
+<link rel="stylesheet" href="assets/home.css">
+<script>try{var t=localStorage.getItem('training-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body data-page="home">
+<div class="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+<header class="sitebar sitebar--home">
+  <div class="sitebar__in glass" data-sheen>
+    <a class="brand" href="#trainers" aria-label="Training, на главную"><span class="brand__mark">∫</span><span class="brand__name">Training</span></a>
+    <nav class="seg-nav" aria-label="Разделы">
+      <span class="seg-nav__drop" aria-hidden="true"></span>
+      <a href="#trainers" data-view="trainers" aria-current="page">Тренажёры</a>
+      <a href="#materials" data-view="materials">Материалы</a>
+      <a href="#about" data-view="about">О сайте</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" type="button" data-mode="system" aria-label="Тема: как в системе" title="Тема: как в системе">
+      <svg class="i i-system" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/></svg>
+      <svg class="i i-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      <svg class="i i-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="page" id="views">
+
+  <!-- ================= Тренажёры ================= -->
+  <section class="view" data-view="trainers" aria-label="Тренажёры">
+    <div class="hero">
+      <div class="hero__text">
+        <p class="eyebrow">Матанализ · 43 темы · 407 задач</p>
+        <h1 class="hero__title">Прорешай матанализ <span class="liquid-word">по шагам</span></h1>
+        <p class="hero__lead">Три тренажёра: пределы, производные и интегралы. В каждом теория, разобранные примеры, задачи с проверкой ответа, калькулятор с пошаговым решением и бесконечный генератор задач.</p>
+        <div class="hero__cta">
+          <a class="lq-btn lq-btn--primary" href="limits.html">Начать с пределов</a>
+          <a class="lq-btn" href="#materials">Шпаргалки в PDF</a>
+        </div>
+        <p class="hero__note">Без регистрации. Прогресс сохраняется в браузере.</p>
+      </div>
+
+      <figure class="lens glass" data-sheen aria-label="Примеры из тренажёров">
+        <div class="lens__head"><span class="lens__label">Пример из тренажёра</span></div>
+        <div class="lens__stage">
+          <div class="ex is-on">
+            <span class="ex__tag">Пределы · эквивалентности</span>
+            <div class="ex__q m"><span class="lim">lim<sub>x→0</sub></span> <span class="fr"><span>sin 3<i>x</i></span><span>tg 5<i>x</i></span></span></div>
+            <ol class="ex__steps">
+              <li>При <i>x</i> → 0: sin 3<i>x</i> ~ 3<i>x</i>, tg 5<i>x</i> ~ 5<i>x</i></li>
+              <li>Заменяем: <span class="fr"><span>3<i>x</i></span><span>5<i>x</i></span></span> = <span class="fr"><span>3</span><span>5</span></span></li>
+            </ol>
+            <div class="ex__ans">= <span class="fr"><span>3</span><span>5</span></span></div>
+          </div>
+          <div class="ex" aria-hidden="true">
+            <span class="ex__tag">Производные · произведение</span>
+            <div class="ex__q m">(<i>x</i><sup>2</sup> · <i>e</i><sup>3<i>x</i></sup>)′</div>
+            <ol class="ex__steps">
+              <li>(<i>uv</i>)′ = <i>u</i>′<i>v</i> + <i>uv</i>′, где <i>u</i> = <i>x</i><sup>2</sup>, <i>v</i> = <i>e</i><sup>3<i>x</i></sup></li>
+              <li>2<i>x</i> · <i>e</i><sup>3<i>x</i></sup> + <i>x</i><sup>2</sup> · 3<i>e</i><sup>3<i>x</i></sup></li>
+            </ol>
+            <div class="ex__ans">= <i>x</i> <i>e</i><sup>3<i>x</i></sup> (3<i>x</i> + 2)</div>
+          </div>
+          <div class="ex" aria-hidden="true">
+            <span class="ex__tag">Интегралы · по частям</span>
+            <div class="ex__q m">∫ <i>x</i> cos <i>x</i> d<i>x</i></div>
+            <ol class="ex__steps">
+              <li><i>u</i> = <i>x</i>, d<i>v</i> = cos <i>x</i> d<i>x</i> ⇒ d<i>u</i> = d<i>x</i>, <i>v</i> = sin <i>x</i></li>
+              <li><i>x</i> sin <i>x</i> − ∫ sin <i>x</i> d<i>x</i></li>
+            </ol>
+            <div class="ex__ans">= <i>x</i> sin <i>x</i> + cos <i>x</i> + <i>C</i></div>
+          </div>
+        </div>
+        <div class="lens__foot">
+          <div class="lens__dots" role="group" aria-label="Выбор примера">
+            <button type="button" aria-pressed="true" aria-label="Пример: предел"></button>
+            <button type="button" aria-pressed="false" aria-label="Пример: производная"></button>
+            <button type="button" aria-pressed="false" aria-label="Пример: интеграл"></button>
+          </div>
+          <span class="note">Такие шаги строит калькулятор</span>
+        </div>
+      </figure>
+    </div>
+
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">По порядку курса</p>
+        <h2 class="h2">Тренажёры</h2>
+      </div>
+    </div>
+
+    <div class="cards">
+      <article class="topic glass" data-topic="limits" data-sheen style="--tint:var(--blob-a)">
+        <div class="topic__top">
+          <div>
+            <p class="topic__step">Часть 1</p>
+            <h3 class="topic__title">Пределы</h3>
+          </div>
+          <div class="topic__glyph" aria-hidden="true">lim</div>
+        </div>
+        <p class="topic__sub">От подстановки до Лопиталя</p>
+        <p class="topic__covers">Неопределённости, замечательные пределы, эквивалентности, правило Лопиталя, формула Тейлора, разрывы.</p>
+        <ul class="facts"><li><b>14</b> тем</li><li><b>130</b> задач</li><li>калькулятор</li><li>генератор</li></ul>
+        <div class="progress"><div class="progress__bar"><i></i></div><span class="progress__txt">Ещё не начато · 130 задач</span></div>
+        <div class="topic__actions">
+          <a class="lq-btn lq-btn--primary topic__go" href="limits.html">Открыть тренажёр<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        </div>
+        <div class="doclinks">
+          <a href="pdf/limits-cheatsheet.pdf" target="_blank" rel="noopener"><span class="pdf-dot">PDF</span>Шпаргалка · 3 с.</a>
+          <a href="pdf/limits-guide.pdf" target="_blank" rel="noopener"><span class="pdf-dot">PDF</span>Разбор · 10 с.</a>
+        </div>
+      </article>
+
+      <article class="topic glass" data-topic="derivatives" data-sheen style="--tint:var(--blob-b)">
+        <div class="topic__top">
+          <div>
+            <p class="topic__step">Часть 2</p>
+            <h3 class="topic__title">Производные</h3>
+          </div>
+          <div class="topic__glyph" aria-hidden="true">y′</div>
+        </div>
+        <p class="topic__sub">От таблицы до «монстров»</p>
+        <p class="topic__covers">Сложные функции, логарифмическое дифференцирование, неявные и параметрические функции, касательная и нормаль.</p>
+        <ul class="facts"><li><b>13</b> тем</li><li><b>116</b> задач</li><li>калькулятор</li><li>генератор</li></ul>
+        <div class="progress"><div class="progress__bar"><i></i></div><span class="progress__txt">Ещё не начато · 116 задач</span></div>
+        <div class="topic__actions">
+          <a class="lq-btn lq-btn--primary topic__go" href="derivatives.html">Открыть тренажёр<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        </div>
+        <div class="doclinks">
+          <a href="pdf/derivatives-cheatsheet.pdf" target="_blank" rel="noopener"><span class="pdf-dot">PDF</span>Шпаргалка · 3 с.</a>
+          <a href="pdf/derivatives-guide.pdf" target="_blank" rel="noopener"><span class="pdf-dot">PDF</span>Разбор · 12 с.</a>
+        </div>
+      </article>
+
+      <article class="topic glass" data-topic="integrals" data-sheen style="--tint:var(--blob-c)">
+        <div class="topic__top">
+          <div>
+            <p class="topic__step">Часть 3</p>
+            <h3 class="topic__title">Интегралы</h3>
+          </div>
+          <div class="topic__glyph" aria-hidden="true">∫</div>
+        </div>
+        <p class="topic__sub">С нуля до экзамена</p>
+        <p class="topic__covers">Замена переменной, по частям, рациональные дроби, тригонометрия, определённые и несобственные интегралы, площади.</p>
+        <ul class="facts"><li><b>16</b> тем</li><li><b>161</b> задача</li><li>калькулятор</li><li>генератор</li></ul>
+        <div class="progress"><div class="progress__bar"><i></i></div><span class="progress__txt">Ещё не начато · 161 задача</span></div>
+        <div class="topic__actions">
+          <a class="lq-btn lq-btn--primary topic__go" href="integrals.html">Открыть тренажёр<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        </div>
+        <div class="doclinks">
+          <a href="pdf/integrals-cheatsheet.pdf" target="_blank" rel="noopener"><span class="pdf-dot">PDF</span>Шпаргалка · 2 с.</a>
+          <a href="pdf/integrals-guide.pdf" target="_blank" rel="noopener"><span class="pdf-dot">PDF</span>Разбор · 10 с.</a>
+        </div>
+      </article>
+    </div>
+
+    <div class="features glass" data-sheen>
+      <div class="feat"><span class="feat__ic" aria-hidden="true">≡</span><h3>Теория, разбор, практика</h3><p>В каждой теме коротко о правилах, пример, разобранный по шагам, и задачи с подсказками.</p></div>
+      <div class="feat"><span class="feat__ic" aria-hidden="true">✓</span><h3>Проверка ответа</h3><p>Ответ вводится как в калькуляторе: 3/5, e^2, sqrt(3)/2. Строка «читаю как» показывает, как он понят.</p></div>
+      <div class="feat"><span class="feat__ic" aria-hidden="true">=</span><h3>Калькулятор с решением</h3><p>Введи любой предел, функцию или интеграл и получи решение по шагам с численной проверкой.</p></div>
+      <div class="feat"><span class="feat__ic" aria-hidden="true">∞</span><h3>Генератор и контрольная</h3><p>Бесконечные задачи трёх уровней и контрольная из 10 случайных задач без подсказок.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= Материалы ================= -->
+  <section class="view" data-view="materials" aria-label="Материалы" hidden>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">6 файлов PDF</p>
+        <h2 class="h2">Шпаргалки и разборы</h2>
+      </div>
+      <p class="lead">Шпаргалку удобно распечатать и держать рядом во время решения. Разбор объясняет тему с нуля: порядок действий, примеры и типичные ошибки.</p>
+    </div>
+
+    <div class="mat-grid">
+      <article class="mat glass" data-sheen>
+        <div class="mat__head"><div class="topic__glyph" style="--tint:var(--blob-a)" aria-hidden="true">lim</div><h3>Пределы</h3></div>
+        <div class="doc">
+          <div class="doc__sheet" aria-hidden="true">PDF</div>
+          <div class="doc__body">
+            <p class="doc__title">Шпаргалка: пределы</p>
+            <span class="doc__meta">3 страницы · 97 КБ</span>
+            <p class="doc__desc">Алгоритм, типы неопределённостей и методы, замечательные пределы, эквивалентности, Тейлор, Лопиталь, разрывы, асимптоты.</p>
+            <div class="doc__actions"><a class="lq-btn lq-btn--sm" href="pdf/limits-cheatsheet.pdf" target="_blank" rel="noopener">Открыть</a><a class="lq-btn lq-btn--sm" href="pdf/limits-cheatsheet.pdf" download="Шпаргалка — пределы.pdf">Скачать</a></div>
+          </div>
+        </div>
+        <div class="doc">
+          <div class="doc__sheet alt" aria-hidden="true">PDF</div>
+          <div class="doc__body">
+            <p class="doc__title">Разбор: как найти любой предел</p>
+            <span class="doc__meta">10 страниц · 183 КБ</span>
+            <p class="doc__desc">Все виды пределов университетского курса: что делать и в каком порядке, примеры от простых до очень сложных, типичные ошибки.</p>
+            <div class="doc__actions"><a class="lq-btn lq-btn--sm" href="pdf/limits-guide.pdf" target="_blank" rel="noopener">Открыть</a><a class="lq-btn lq-btn--sm" href="pdf/limits-guide.pdf" download="Разбор — как найти любой предел.pdf">Скачать</a></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="mat glass" data-sheen>
+        <div class="mat__head"><div class="topic__glyph" style="--tint:var(--blob-b)" aria-hidden="true">y′</div><h3>Производные</h3></div>
+        <div class="doc">
+          <div class="doc__sheet" aria-hidden="true">PDF</div>
+          <div class="doc__body">
+            <p class="doc__title">Шпаргалка: производные</p>
+            <span class="doc__meta">3 страницы · 105 КБ</span>
+            <p class="doc__desc">Таблица производных, правила, алгоритм, особые случаи, применения и типичные ошибки.</p>
+            <div class="doc__actions"><a class="lq-btn lq-btn--sm" href="pdf/derivatives-cheatsheet.pdf" target="_blank" rel="noopener">Открыть</a><a class="lq-btn lq-btn--sm" href="pdf/derivatives-cheatsheet.pdf" download="Шпаргалка — производные.pdf">Скачать</a></div>
+          </div>
+        </div>
+        <div class="doc">
+          <div class="doc__sheet alt" aria-hidden="true">PDF</div>
+          <div class="doc__body">
+            <p class="doc__title">Разбор: как взять любую производную</p>
+            <span class="doc__meta">12 страниц · 213 КБ</span>
+            <p class="doc__desc">Все виды производных из университетского курса: порядок действий, примеры от простых до очень длинных, типичные ошибки.</p>
+            <div class="doc__actions"><a class="lq-btn lq-btn--sm" href="pdf/derivatives-guide.pdf" target="_blank" rel="noopener">Открыть</a><a class="lq-btn lq-btn--sm" href="pdf/derivatives-guide.pdf" download="Разбор — как взять любую производную.pdf">Скачать</a></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="mat glass" data-sheen>
+        <div class="mat__head"><div class="topic__glyph" style="--tint:var(--blob-c)" aria-hidden="true">∫</div><h3>Интегралы</h3></div>
+        <div class="doc">
+          <div class="doc__sheet" aria-hidden="true">PDF</div>
+          <div class="doc__body">
+            <p class="doc__title">Шпаргалка: интегралы</p>
+            <span class="doc__meta">2 страницы · 86 КБ</span>
+            <p class="doc__desc">Таблица, алгоритм выбора метода, замена, по частям, дроби, тригонометрия, корни, определённые и несобственные интегралы.</p>
+            <div class="doc__actions"><a class="lq-btn lq-btn--sm" href="pdf/integrals-cheatsheet.pdf" target="_blank" rel="noopener">Открыть</a><a class="lq-btn lq-btn--sm" href="pdf/integrals-cheatsheet.pdf" download="Шпаргалка — интегралы.pdf">Скачать</a></div>
+          </div>
+        </div>
+        <div class="doc">
+          <div class="doc__sheet alt" aria-hidden="true">PDF</div>
+          <div class="doc__body">
+            <p class="doc__title">Разбор: интегралы с нуля до экзамена</p>
+            <span class="doc__meta">10 страниц · 180 КБ</span>
+            <p class="doc__desc">От идеи «площадь под графиком» до простейших дробей, подстановок и несобственных интегралов. Алгоритм выбора метода и типичные ошибки.</p>
+            <div class="doc__actions"><a class="lq-btn lq-btn--sm" href="pdf/integrals-guide.pdf" target="_blank" rel="noopener">Открыть</a><a class="lq-btn lq-btn--sm" href="pdf/integrals-guide.pdf" download="Разбор — интегралы с нуля до экзамена.pdf">Скачать</a></div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= О сайте ================= -->
+  <section class="view" data-view="about" aria-label="О сайте" hidden>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Training</p>
+        <h2 class="h2">О сайте</h2>
+      </div>
+    </div>
+
+    <div class="about">
+      <div class="about__main glass" data-sheen>
+        <p><b>Training</b> — сайт для прорешки тем по математическому анализу. Здесь три тренажёра: пределы, производные и интегралы. В них 43 темы с теорией и разобранными примерами, 407 задач с проверкой ответа, калькуляторы с пошаговым решением, генераторы задач и шпаргалки в PDF.</p>
+
+        <div>
+          <h3 class="h3">Как заниматься</h3>
+          <ol class="steps-list">
+            <li><span>Иди по порядку курса: пределы, затем производные, затем интегралы.</span></li>
+            <li><span>В каждой теме прочитай теорию, посмотри разбор примера и реши задачи.</span></li>
+            <li><span>Застрял — открой подсказку или пошаговое решение.</span></li>
+            <li><span>Проверь себя контрольной: 10 случайных задач, одна попытка на каждую, без подсказок.</span></li>
+            <li><span>Слабые темы добивай в генераторе задач.</span></li>
+          </ol>
+        </div>
+
+        <div>
+          <h3 class="h3">Как вводить ответ</h3>
+          <ul class="codechips" aria-label="Примеры записи">
+            <li>3/5</li><li>e^2</li><li>sqrt(3)/2</li><li>ln(x)</li><li>sin(3x)</li><li>pi/4</li><li>inf</li>
+          </ul>
+          <p class="note">Набирай с клавиатуры или кнопками под полем: дробь, степень, корень, функции. Строка «читаю как» сразу показывает, как понята запись, так что опечатку видно до проверки.</p>
+        </div>
+
+        <div>
+          <h3 class="h3">Где хранится прогресс</h3>
+          <p class="note">Отметки о решённых задачах хранятся только в этом браузере. Регистрации нет, данные никуда не отправляются. На другом устройстве или после очистки данных сайта прогресс начнётся заново.</p>
+          <div style="margin-top:12px"><button class="lq-btn lq-btn--sm" id="resetAll" type="button">Сбросить весь прогресс</button></div>
+        </div>
+      </div>
+
+      <div class="about__side">
+        <div class="person glass" data-sheen>
+          <p class="eyebrow">Кто сделал</p>
+          <div class="person__row">
+            <div class="avatar" aria-hidden="true">X<img src="https://github.com/Xtop1337.png?size=160" alt="" onerror="this.remove()"></div>
+            <div>
+              <p class="person__name">Xtop1337</p>
+              <p class="person__handle">github.com/Xtop1337</p>
+            </div>
+          </div>
+          <a class="lq-btn lq-btn--primary" href="https://github.com/Xtop1337" target="_blank" rel="noopener"><svg class="gh" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Профиль на GitHub</a>
+        </div>
+
+        <div class="person glass" data-sheen>
+          <p class="eyebrow">Исходный код</p>
+          <div>
+            <p class="person__name">Training</p>
+            <p class="person__handle">github.com/Xtop1337/Training</p>
+          </div>
+          <p>Статический сайт на HTML, CSS и JavaScript без сборки и зависимостей. Работает на GitHub Pages и открывается с телефона.</p>
+          <a class="lq-btn" href="https://github.com/Xtop1337/Training" target="_blank" rel="noopener"><svg class="gh" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Открыть репозиторий</a>
+        </div>
+
+        <div class="stats glass" data-sheen>
+          <div class="stat"><b>3</b><span>тренажёра</span></div>
+          <div class="stat"><b>43</b><span>темы</span></div>
+          <div class="stat"><b>407</b><span>задач с проверкой</span></div>
+          <div class="stat"><b>6</b><span>PDF-материалов</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="sitefoot">
+  <span>Training · тренажёры по матанализу</span>
+  <span>Сделал <a href="https://github.com/Xtop1337" target="_blank" rel="noopener">Xtop1337</a> · <a href="https://github.com/Xtop1337/Training" target="_blank" rel="noopener">исходный код</a></span>
+</footer>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
