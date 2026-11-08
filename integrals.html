@@ -159,6 +159,7 @@ details summary{cursor:pointer;color:var(--accent);font-weight:500}
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/glass.css">
 <link rel="stylesheet" href="assets/trainer.css">
+<link rel="stylesheet" href="assets/auth.css">
 <script>try{var t=localStorage.getItem('training-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
 <body data-page="trainer" data-topic="integrals">
@@ -2980,7 +2981,7 @@ function autoSteps(P){
 const KEY='integrals-progress-v1';
 let done={};
 try{done=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){done={}}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}if(window.TrainerBridge&&TrainerBridge.onSave)TrainerBridge.onSave(done)}; // Training: + отправка в аккаунт
 const key=(t,i)=>`${t}-${i}`;
 const total=TOPICS.reduce((s,T)=>s+T.probs.length,0);
 const solvedIn=t=>TOPICS[t].probs.filter((_,i)=>done[key(t,i)]).length;
@@ -3275,14 +3276,18 @@ function renderExam(){
 }
 $('#examBtn').onclick=startExam;
 $('#resetBtn').onclick=()=>{if(confirm('Сбросить отметки о решённых задачах?')){done={};save();render()}};
+/* Training: связь с аккаунтом (assets/auth.js) — прогресс с сервера и лимит задач без входа */
+window.TrainerBridge={key:KEY,mode:()=>state.mode,genTask:()=>state.gen.cur,onSave:null,
+  setDone(d){done=d||{};try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}render()}};
 render();
 
 </script>
 <!-- Training: подвал и общий скрипт сайта -->
 <footer class="sitefoot">
   <span><a href="index.html">Training</a> · <a href="index.html#materials">Все материалы</a> · <a href="index.html#about">О сайте</a></span>
-  <span>Сделал <a href="https://github.com/Xtop1337" target="_blank" rel="noopener">Xtop1337</a> · <a href="https://github.com/Xtop1337/Training" target="_blank" rel="noopener">исходный код</a></span>
+  <span>Сделали <a href="https://github.com/Xtop1337" target="_blank" rel="noopener">Xtop1337</a> и <a href="https://github.com/il1mated" target="_blank" rel="noopener">il1mated</a> · <a href="https://github.com/Xtop1337/Training" target="_blank" rel="noopener">исходный код</a></span>
 </footer>
 <script src="assets/site.js"></script>
+<script src="assets/auth.js"></script>
 </body>
 </html>

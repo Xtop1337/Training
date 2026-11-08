@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/glass.css">
 <link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/auth.css">
 <script>try{var t=localStorage.getItem('training-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
 <body data-page="home">
@@ -49,7 +50,7 @@
           <a class="lq-btn lq-btn--primary" href="limits.html">Начать с пределов</a>
           <a class="lq-btn" href="#materials">Шпаргалки в PDF</a>
         </div>
-        <p class="hero__note">Без регистрации. Прогресс сохраняется в браузере.</p>
+        <p class="hero__note" id="heroNote">Можно без регистрации. Прогресс сохраняется в браузере.</p>
       </div>
 
       <figure class="lens glass" data-sheen aria-label="Примеры из тренажёров">
@@ -287,14 +288,14 @@
 
         <div>
           <h3 class="h3">Где хранится прогресс</h3>
-          <p class="note">Отметки о решённых задачах хранятся только в этом браузере. Регистрации нет, данные никуда не отправляются. На другом устройстве или после очистки данных сайта прогресс начнётся заново.</p>
+          <p class="note" id="progressNote">Отметки о решённых задачах хранятся только в этом браузере. На другом устройстве или после очистки данных сайта прогресс начнётся заново.</p>
           <div style="margin-top:12px"><button class="lq-btn lq-btn--sm" id="resetAll" type="button">Сбросить весь прогресс</button></div>
         </div>
       </div>
 
       <div class="about__side">
         <div class="person glass" data-sheen>
-          <p class="eyebrow">Кто сделал</p>
+          <p class="eyebrow">Сайт и тренажёры</p>
           <div class="person__row">
             <div class="avatar" aria-hidden="true">X<img src="https://github.com/Xtop1337.png?size=160" alt="" onerror="this.remove()"></div>
             <div>
@@ -306,12 +307,24 @@
         </div>
 
         <div class="person glass" data-sheen>
+          <p class="eyebrow">Бэкенд и авторизация</p>
+          <div class="person__row">
+            <div class="avatar" aria-hidden="true">I<img src="https://github.com/il1mated.png?size=160" alt="" onerror="this.remove()"></div>
+            <div>
+              <p class="person__name">il1mated</p>
+              <p class="person__handle">github.com/il1mated</p>
+            </div>
+          </div>
+          <a class="lq-btn lq-btn--primary" href="https://github.com/il1mated" target="_blank" rel="noopener"><svg class="gh" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Профиль на GitHub</a>
+        </div>
+
+        <div class="person glass" data-sheen>
           <p class="eyebrow">Исходный код</p>
           <div>
             <p class="person__name">Training</p>
             <p class="person__handle">github.com/Xtop1337/Training</p>
           </div>
-          <p>Статический сайт на HTML, CSS и JavaScript без сборки и зависимостей. Работает на GitHub Pages и открывается с телефона.</p>
+          <p>Сайт на HTML, CSS и JavaScript без сборки, работает на GitHub Pages и открывается с телефона. Аккаунты, вход по почте и прогресс — отдельный бэкенд на Python (Flask) с базой SQLite.</p>
           <a class="lq-btn" href="https://github.com/Xtop1337/Training" target="_blank" rel="noopener"><svg class="gh" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Открыть репозиторий</a>
         </div>
 
@@ -328,9 +341,10 @@
 
 <footer class="sitefoot">
   <span>Training · тренажёры по матанализу</span>
-  <span>Сделал <a href="https://github.com/Xtop1337" target="_blank" rel="noopener">Xtop1337</a> · <a href="https://github.com/Xtop1337/Training" target="_blank" rel="noopener">исходный код</a></span>
+  <span>Сделали <a href="https://github.com/Xtop1337" target="_blank" rel="noopener">Xtop1337</a> и <a href="https://github.com/il1mated" target="_blank" rel="noopener">il1mated</a> · <a href="https://github.com/Xtop1337/Training" target="_blank" rel="noopener">исходный код</a></span>
 </footer>
 
 <script src="assets/site.js"></script>
+<script src="assets/auth.js"></script>
 </body>
 </html>

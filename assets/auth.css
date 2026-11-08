@@ -1,0 +1,134 @@
+/* Training — вход и регистрация: кнопка аккаунта в верхней панели и окно входа (assets/auth.js).
+   Токены и стекло берутся из glass.css, аватар и строки профиля — из home.css. */
+
+/* ---------- кнопка аккаунта в панели ---------- */
+.account-btn{flex:none;display:inline-flex;align-items:center;gap:8px;height:44px;max-width:210px;padding:0 16px 0 12px;
+  border-radius:999px;border:1px solid var(--rim-soft);cursor:pointer;color:var(--ink);font:500 15px/1 var(--f-body);
+  background:linear-gradient(180deg,var(--fill-hover),var(--fill));box-shadow:inset 0 1px 0 var(--rim),0 6px 14px -10px var(--shade);
+  transition:transform .5s var(--spring),background .25s}
+.account-btn:hover{background:var(--fill-hover);transform:scale(1.04)}
+.account-btn:active{transform:scale(.94);transition-duration:.12s}
+.account-btn__icon{width:20px;height:20px;flex:none}
+.account-btn__text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-btn__ava{display:none;width:30px;height:30px;flex:none;border-radius:50%;place-items:center;
+  font:600 14px/1 var(--f-display);color:var(--on-accent);
+  background:radial-gradient(circle at 34% 28%,color-mix(in oklab,var(--accent) 45%,white),var(--accent) 60%,color-mix(in oklab,var(--accent) 70%,black));
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.55)}
+.account-btn[data-state="in"]{padding-left:6px}
+.account-btn[data-state="in"] .account-btn__icon{display:none}
+.account-btn[data-state="in"] .account-btn__ava{display:grid}
+
+/* ---------- окно входа ---------- */
+dialog.auth{width:min(420px,calc(100% - 32px));max-width:none;max-height:calc(100dvh - 32px);
+  padding:0;border:0;background:transparent;color:var(--ink);overflow:visible}
+dialog.auth::backdrop{background:rgba(8,12,27,.32);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.auth[open] .auth__in{animation:auth-pop .5s var(--spring) both}
+@keyframes auth-pop{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+.auth__in{padding:26px 24px 24px;display:grid;gap:18px;max-height:calc(100dvh - 32px);overflow:auto}
+.auth__head{padding-right:44px}
+.auth__title{margin:4px 0 0;font:600 26px/1.15 var(--f-display);letter-spacing:-.01em}
+.auth__close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:1px solid var(--rim-soft);
+  cursor:pointer;color:var(--muted);display:grid;place-items:center;background:var(--fill);box-shadow:inset 0 1px 0 var(--rim);
+  transition:transform .5s var(--spring),color .2s}
+.auth__close:hover{color:var(--ink);transform:rotate(90deg)}
+.auth__close svg{width:16px;height:16px}
+
+.auth__tabs{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:4px;border-radius:999px;
+  background:var(--well);box-shadow:inset 0 1px 3px var(--shade),inset 0 0 0 1px var(--rim-soft)}
+.auth__tabs button{all:unset;cursor:pointer;text-align:center;padding:9px 12px;border-radius:999px;
+  color:var(--muted);font:500 15px/1.2 var(--f-body);transition:color .25s,background .25s,box-shadow .25s}
+.auth__tabs button:hover{color:var(--ink)}
+.auth__tabs button[aria-pressed="true"]{color:var(--ink);background:linear-gradient(180deg,var(--glass-hi),var(--fill-hover));
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim-soft),0 6px 16px -6px var(--shade)}
+.auth__tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.auth__form,.auth__profile{display:grid;gap:14px}
+.field{display:grid;gap:6px}
+.field span{font-size:13.5px;font-weight:500;color:var(--muted)}
+.field input{width:100%;font:16px/1.3 var(--f-body);color:var(--ink);padding:12px 14px;border:0;border-radius:var(--r-md);
+  background:var(--well);box-shadow:inset 0 1px 3px var(--shade),inset 0 0 0 1px var(--rim-soft);outline:none;transition:box-shadow .2s}
+.field input:focus-visible{box-shadow:inset 0 1px 3px var(--shade),0 0 0 2px var(--accent)}
+.auth__hint{margin:-2px 0 0;font-size:13.5px;color:var(--muted)}
+.auth__error{margin:0;font-size:14px;line-height:1.4;color:var(--coral);padding:9px 12px;border-radius:var(--r-sm);
+  background:color-mix(in oklab,var(--coral) 12%,transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--coral) 40%,transparent)}
+.auth__submit{width:100%;margin-top:4px}
+.auth__submit:disabled{opacity:.6;cursor:progress;transform:none}
+.auth__profile .lq-btn{justify-self:start}
+
+/* окно подключается и в тренажёрах, где нет home.css, поэтому все его стили — свои */
+.auth__eyebrow{margin:0;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.auth__in p{margin:0}
+.auth__note{font-size:14.5px;color:var(--muted)}
+.auth__notice{font-size:14.5px;line-height:1.45;padding:11px 14px;border-radius:var(--r-md);
+  background:color-mix(in oklab,var(--accent) 12%,transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--accent) 35%,transparent)}
+.auth__notice[data-kind="ok"]{background:color-mix(in oklab,var(--mint) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--mint) 45%,transparent)}
+.auth__notice[data-kind="warn"]{background:color-mix(in oklab,var(--amber) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--amber) 50%,transparent)}
+.auth__link{all:unset;justify-self:center;cursor:pointer;color:var(--accent);font:500 14.5px/1.3 var(--f-body);
+  border-bottom:1px solid color-mix(in oklab,var(--accent) 40%,transparent)}
+.auth__link:hover{border-color:currentColor}
+.auth__link:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.auth__sent{display:grid;gap:14px;font-size:15.5px}
+.auth__mail{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font:600 28px/1 var(--f-display);color:var(--on-accent);
+  background:radial-gradient(circle at 34% 28%,color-mix(in oklab,var(--mint) 45%,white),var(--mint) 60%,color-mix(in oklab,var(--mint) 70%,black));
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.55),0 12px 24px -12px var(--mint);animation:auth-float 3s ease-in-out infinite alternate}
+@keyframes auth-float{to{transform:translateY(-4px) rotate(-6deg)}}
+.auth__sent b{overflow-wrap:anywhere}
+.auth__row{display:flex;flex-wrap:wrap;gap:8px}
+.auth__person{display:flex;align-items:center;gap:16px}
+.auth__ava{width:64px;height:64px;flex:none;border-radius:50%;display:grid;place-items:center;
+  font:700 26px/1 var(--f-display);color:var(--on-accent);
+  background:radial-gradient(circle at 34% 28%,color-mix(in oklab,var(--accent) 45%,white),var(--accent) 60%,color-mix(in oklab,var(--accent) 70%,black));
+  box-shadow:0 0 0 3px var(--rim),0 14px 26px -12px var(--shade)}
+.auth__name{font:600 21px/1.15 var(--f-display);word-break:break-word}
+.auth__sub{margin-top:2px!important;color:var(--muted);font-size:14.5px;word-break:break-all}
+
+/* ---------- без входа: плашка с лимитом задач в тренажёре ---------- */
+.guest-note{display:grid;gap:10px;margin:14px 0 4px;padding:14px;border-radius:var(--r-lg);font-size:14px;line-height:1.4;
+  background:var(--fill);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim-soft)}
+.guest-note p{margin:0;color:var(--muted)}
+.guest-note .lq-btn{justify-self:start}
+.guest-note__bar{height:7px;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 2px var(--shade);overflow:hidden}
+.guest-note__bar i{display:block;height:100%;border-radius:inherit;background:var(--accent);transition:width .6s var(--spring)}
+.guest-note.is-full{background:color-mix(in oklab,var(--amber) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--amber) 45%,transparent)}
+.guest-note.is-full p{color:var(--ink)}
+.guest-note.is-full .guest-note__bar i{background:var(--amber)}
+
+/* ---------- без входа: материалы под замком ---------- */
+.is-locked{position:relative;border-radius:18px}
+.is-locked > :not(.lock-veil){filter:blur(5px);opacity:.75;pointer-events:none;user-select:none}
+.doclinks.is-locked{min-height:38px}
+.lock-veil{all:unset;position:absolute;inset:0;z-index:2;display:grid;place-items:center;
+  cursor:pointer;border-radius:inherit;color:var(--ink);font:500 14px/1.2 var(--f-body)}
+.lock-veil__ic{width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(180deg,var(--glass-hi),var(--fill-hover));
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim-soft),0 10px 22px -10px var(--shade);transition:transform .5s var(--spring)}
+.lock-veil__ic svg{width:19px;height:19px}
+.lock-veil__text{position:absolute;left:50%;top:calc(50% + 26px);padding:7px 12px;border-radius:999px;white-space:nowrap;background:var(--glass-hi);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim-soft),0 8px 18px -10px var(--shade);
+  opacity:0;transform:translate(-50%,-6px);transition:opacity .25s,transform .45s var(--spring);pointer-events:none}
+.lock-veil:hover .lock-veil__ic{transform:scale(1.08) rotate(-6deg)}
+.lock-veil:hover .lock-veil__text,.lock-veil:focus-visible .lock-veil__text{opacity:1;transform:translate(-50%,0)}
+.lock-veil:focus-visible .lock-veil__ic{outline:2px solid var(--accent);outline-offset:3px}
+/* на телефоне наведения нет — подпись видна сразу */
+@media (hover:none){.lock-veil__text{opacity:1;transform:translate(-50%,0)}}
+/* в узких местах (ссылки на карточке темы) подпись показываем сбоку от замка */
+.doclinks .lock-veil{place-items:center start}
+.doclinks .lock-veil__text{top:50%;left:48px;transform:translate(-6px,-50%)}
+.doclinks .lock-veil:hover .lock-veil__text,.doclinks .lock-veil:focus-visible .lock-veil__text{transform:translate(0,-50%)}
+@media (hover:none){.doclinks .lock-veil__text{transform:translate(0,-50%)}}
+
+@media (max-width:640px){
+  .account-btn,.account-btn[data-state="in"]{width:40px;height:40px;padding:0;justify-content:center}
+  .account-btn__text{display:none}
+  .auth__in{padding:22px 18px 20px}
+}
+/* на узком телефоне кнопка аккаунта отнимает место у вкладок — делаем панель плотнее,
+   но только когда кнопка видна */
+@media (max-width:480px){
+  .sitebar__in:has(.account-btn:not([hidden])){gap:4px}
+  .sitebar__in:has(.account-btn:not([hidden])) .seg-nav a{padding:8px 7px;font-size:13px}
+  .sitebar__in:has(.account-btn:not([hidden])) .theme-btn,
+  .account-btn,.account-btn[data-state="in"]{width:36px;height:36px}
+  .account-btn__icon{width:18px;height:18px}
+  .account-btn__ava{width:26px;height:26px;font-size:13px}
+}

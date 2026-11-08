@@ -133,6 +133,7 @@
           timer=setTimeout(function(){armed=false;rAll.textContent=label;rAll.classList.remove('is-armed')},4000);return}
         clearTimeout(timer);armed=false;rAll.classList.remove('is-armed');
         TOPICS.forEach(function(t){store.set(t.key,null)});paintProgress();
+        document.dispatchEvent(new CustomEvent('training:reset')); // auth.js сбросит прогресс и в аккаунте
         rAll.textContent='Прогресс сброшен';setTimeout(function(){rAll.textContent=label},2200);
       });
     }
