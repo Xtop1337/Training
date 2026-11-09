@@ -100,7 +100,11 @@ python backend/app.py
      | `ALLOWED_ORIGINS` | необязательно: другие адреса сайта через запятую |
      | `DEBUG` | `0` |
 
-     Проверка: `https://<адрес-на-render>/api/health` должен ответить `{"ok":true}`.
+     Если `API_URL` или `SITE_URL` не заданы, на Render берутся адрес самого сервиса и адрес сайта на Vercel.
+
+     Проверка: `https://<адрес-на-render>/api/health` (или просто главный адрес сервиса) отвечает JSON
+     с `"ok": true`. В нём же видно, какая база (`postgres` — правильно, `sqlite` — не задан `DATABASE_URL`)
+     и включена ли почта (`brevo`; `off` — не задан `BREVO_API_KEY`).
 4. **Сайт — Vercel** → Add New → Project → тот же репозиторий, Root Directory `./`.
    При импорте Vercel видит Flask в `backend/` и предлагает пресет Flask. Это не страшно:
    `vercel.json` (`"framework": null`) всё равно собирает сайт как статический (Other).

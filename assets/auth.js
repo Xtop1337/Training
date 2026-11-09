@@ -9,8 +9,8 @@
   /* ================= настройки ================= */
   // Когда сайт открыт локально (http://localhost:8000), запросы идут на сервер,
   // запущенный командой «python backend/app.py».
-  // Когда бэкенд появится на хостинге, впиши сюда его адрес, например 'https://training-api.example.com'.
-  const PRODUCTION_API_URL = '';
+  // На сайте (Vercel, GitHub Pages) запросы идут на бэкенд на Render.
+  const PRODUCTION_API_URL = 'https://training-mv0x.onrender.com';
   const LOCAL_API_URL = 'http://127.0.0.1:5000';
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   const API_URL = isLocal ? LOCAL_API_URL : PRODUCTION_API_URL;

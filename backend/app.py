@@ -196,13 +196,48 @@ def clean_progress(data):
 
 # ---------- адреса API ----------
 
+def make_status():
+    """
+    Функция, которая собирает короткую сводку о сервере для проверки настроек.
+    Секретов в ней нет: только какая база и почта включены и куда ведут ссылки.
+    """
+    if config.BREVO_API_KEY:
+        mail = "brevo"
+    elif config.SMTP_HOST:
+        mail = "smtp"
+    else:
+        mail = "off"
+    status = {
+        "ok": True,
+        "database": "postgres" if database.USE_POSTGRES else "sqlite",
+        "mail": mail,
+        "api_url": config.API_URL,
+        "site_url": config.SITE_URL,
+    }
+
+    return status
+
+
+@app.get("/")
+def index():
+    """
+    Главная страница сервера. Сам сайт живёт на Vercel, а здесь только API,
+    поэтому показываем, что сервер работает, и где что лежит.
+    """
+    status = make_status()
+    status["service"] = "Training API"
+    status["health"] = "/api/health"
+
+    return jsonify(status)
+
+
 @app.get("/api/health")
 def health():
     """
     Функция для проверки, что сервер запущен и отвечает.
     """
 
-    return jsonify({"ok": True})
+    return jsonify(make_status())
 
 
 @app.post("/api/register")

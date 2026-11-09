@@ -53,17 +53,31 @@ PORT = int(os.environ.get("PORT", "5000"))
 # На настоящем хостинге нужно поставить DEBUG=0 в .env.
 DEBUG = os.environ.get("DEBUG", "1") == "1"
 
+# Рабочий адрес сайта на Vercel. Подставляется на Render, если SITE_URL там не задан.
+PRODUCTION_SITE_URL = "https://training-psi-eight.vercel.app"
+
+# Render сам задаёт переменные RENDER и RENDER_EXTERNAL_URL (адрес сервиса, например
+# https://training-mv0x.onrender.com). По ним понимаем, что сервер запущен на хостинге.
+ON_RENDER = bool(os.environ.get("RENDER"))
+
 # Адрес самого сервера: из него собирается ссылка в письме.
-API_URL = os.environ.get("API_URL", "http://127.0.0.1:5000").strip().rstrip("/")
+# Если API_URL не задан, на Render берётся его собственный адрес.
+API_URL = (
+    os.environ.get("API_URL") or os.environ.get("RENDER_EXTERNAL_URL") or "http://127.0.0.1:5000"
+).strip().rstrip("/")
 
 # Адрес сайта: сюда пользователь попадает после подтверждения почты.
-SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000").strip().rstrip("/")
+# Если SITE_URL не задан, на Render это адрес сайта на Vercel, у себя — http://localhost:8000.
+SITE_URL = (
+    os.environ.get("SITE_URL") or (PRODUCTION_SITE_URL if ON_RENDER else "http://localhost:8000")
+).strip().rstrip("/")
 
 # Сайты, которым разрешено обращаться к API (CORS).
 # Без этого браузер не даст странице с другого адреса читать ответы сервера.
 # На хостинге адрес сайта (например, на Vercel) добавляется через переменную
 # ALLOWED_ORIGINS — несколько адресов через запятую, без / в конце.
 ALLOWED_ORIGINS = [
+    PRODUCTION_SITE_URL,
     "https://xtop1337.github.io",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
