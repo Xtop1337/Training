@@ -224,6 +224,17 @@ def can_send_mail(user):
     return allowed
 
 
+def confirm_user(user_id):
+    """
+    Функция, которая отмечает почту пользователя подтверждённой без письма.
+    Нужна, когда на хостинге почта не настроена и письмо со ссылкой отправить нельзя.
+    """
+    connection = get_connection()
+    run(connection, "UPDATE users SET is_confirmed = 1 WHERE id = ?", (user_id,))
+    connection.commit()
+    connection.close()
+
+
 # ---------- подтверждение почты ----------
 
 def create_email_code(user_id):

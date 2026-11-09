@@ -54,7 +54,7 @@ PORT = int(os.environ.get("PORT", "5000"))
 DEBUG = os.environ.get("DEBUG", "1") == "1"
 
 # Рабочий адрес сайта на Vercel. Подставляется на Render, если SITE_URL там не задан.
-PRODUCTION_SITE_URL = "https://training-psi-eight.vercel.app"
+PRODUCTION_SITE_URL = "https://training-theta-eight.vercel.app"
 
 # Render сам задаёт переменные RENDER и RENDER_EXTERNAL_URL (адрес сервиса, например
 # https://training-mv0x.onrender.com). По ним понимаем, что сервер запущен на хостинге.
@@ -130,3 +130,14 @@ SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 # Адрес отправителя; если не задан, берётся логин SMTP
 MAIL_FROM = os.environ.get("MAIL_FROM") or SMTP_USER
+
+# Настроена ли отправка писем (Brevo или SMTP)
+MAIL_ENABLED = bool(BREVO_API_KEY or SMTP_HOST)
+
+# Работают ли ссылки из писем: подтверждение почты и смена пароля.
+# Почта настроена — письма уходят по-настоящему. У себя на компьютере без почты ссылка
+# печатается в терминал. А на хостинге без почты письма никто не получит, поэтому:
+#   - регистрация сразу открывает аккаунт, без подтверждения почты;
+#   - восстановление пароля по почте недоступно.
+# Подключишь Brevo (BREVO_API_KEY) — подтверждение и восстановление включатся сами.
+EMAIL_LINKS = MAIL_ENABLED or not ON_RENDER

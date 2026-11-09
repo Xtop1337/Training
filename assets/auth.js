@@ -19,9 +19,21 @@
   // аккаунты и ограничения выключены, и сайт работает как раньше.
   if (!API_URL) return;
 
-  // Бесплатный Render засыпает после 15 минут без запросов и просыпается до минуты.
-  // Будим сервер сразу при открытии страницы, чтобы ко входу он уже отвечал.
-  if (!isLocal) fetch(API_URL + '/api/health').catch(function () {});
+  // Работают ли ссылки из писем (подтверждение почты, смена пароля). Если почта на сервере
+  // не настроена, сервер отвечает email_links: false — тогда регистрация сразу открывает аккаунт,
+  // а «Забыл пароль?» скрыт. Узнаём это из /api/health.
+  let mailLinks = true;
+  // Этот же запрос будит бесплатный Render: он засыпает после 15 минут без запросов
+  // и просыпается до минуты, поэтому стучимся сразу при открытии страницы.
+  fetch(API_URL + '/api/health')
+    .then(function (response) { return response.json(); })
+    .then(function (info) {
+      if (info && info.email_links === false) {
+        mailLinks = false;
+        applyMailMode();
+      }
+    })
+    .catch(function () {});
 
   const GUEST_LIMIT = 5;                                  // сколько задач можно решить без входа
   const TOKEN_KEY = 'training-auth-token';                // токен сессии после входа
@@ -199,9 +211,15 @@
     passwordInput.autocomplete = isLogin ? 'current-password' : 'new-password';
     $('authHint').hidden = isLogin;
     $('authResend').hidden = true;
-    $('authForgotLink').hidden = !isLogin;
+    $('authForgotLink').hidden = !isLogin || !mailLinks;
     tabs.forEach(function (tab) { tab.setAttribute('aria-pressed', String(tab.dataset.mode === mode)); });
     showError('');
+  }
+
+  // Почта на сервере не настроена: меняем подсказку и прячем «Забыл пароль?»
+  function applyMailMode() {
+    $('authHint').textContent = 'Пароль — не короче 6 символов. Подтверждать почту не нужно: после регистрации ты сразу войдёшь. Запомни пароль — восстановить его по почте пока нельзя.';
+    $('authForgotLink').hidden = true;
   }
 
   function showError(message) {
@@ -277,7 +295,10 @@
     try {
       const res = await api(mode === 'login' ? '/api/login' : '/api/register', 'POST', { email: email, password: password });
       pending = { email: email, password: password };
-      if (res.ok && mode === 'register') {
+      if (res.ok && res.data.token) {
+        // вход, или регистрация без подтверждения почты (почта на сервере не настроена)
+        await onLoggedIn(res.data.token, res.data.user);
+      } else if (res.ok && mode === 'register') {
         passwordInput.value = '';
         showSent(res.data.email || email);
       } else if (res.ok) {

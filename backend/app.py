@@ -211,6 +211,7 @@ def make_status():
         "ok": True,
         "database": "postgres" if database.USE_POSTGRES else "sqlite",
         "mail": mail,
+        "email_links": config.EMAIL_LINKS,
         "api_url": config.API_URL,
         "site_url": config.SITE_URL,
     }
@@ -260,6 +261,13 @@ def register():
     except database.INTEGRITY_ERRORS:
         return make_error("Эта почта уже зарегистрирована. Попробуй войти.", 409, "exists")
 
+    # Почта на хостинге не настроена: письмо не дойдёт, поэтому сразу открываем аккаунт
+    if not config.EMAIL_LINKS:
+        database.confirm_user(user_id)
+        token = database.create_session(user_id)
+        user = database.find_user_by_id(user_id)
+        return jsonify({"token": token, "user": make_user_info(user), "message": "Аккаунт создан, ты вошёл."}), 201
+
     if not send_confirm_mail(user_id, email):
         return make_error(
             "Аккаунт создан, но письмо не отправилось. Попробуй войти — мы предложим отправить его ещё раз.",
@@ -295,7 +303,7 @@ def resend():
     if user is None or not check_password_hash(user["password_hash"], password):
         return make_error("Неверная почта или пароль", 401)
 
-    if user["is_confirmed"]:
+    if user["is_confirmed"] or not config.EMAIL_LINKS:
         return jsonify({"message": "Почта уже подтверждена — можно входить."})
 
     if not database.can_send_mail(user):
@@ -314,6 +322,9 @@ def forgot_password():
     Ответ всегда одинаковый, есть такая почта в базе или нет, —
     чтобы по нему нельзя было узнать, кто зарегистрирован на сайте.
     """
+    if not config.EMAIL_LINKS:
+        return make_error("Восстановление пароля по почте пока недоступно.", 503, "no_mail")
+
     email = str(read_json().get("email", "")).strip().lower()
 
     error = check_email(email)
@@ -374,7 +385,7 @@ def login():
     if user is None or not check_password_hash(user["password_hash"], password):
         return make_error("Неверная почта или пароль", 401)
 
-    if not user["is_confirmed"]:
+    if not user["is_confirmed"] and config.EMAIL_LINKS:
         return make_error("Сначала подтверди почту — ссылка в письме.", 403, "not_confirmed")
 
     token = database.create_session(user["id"])

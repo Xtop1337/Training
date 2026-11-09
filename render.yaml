@@ -21,7 +21,7 @@ services:
         sync: false
       - key: API_URL           # адрес этого сервиса, например https://training-api.onrender.com
         sync: false
-      - key: SITE_URL          # адрес сайта на Vercel, например https://training-5bre.vercel.app
+      - key: SITE_URL          # адрес сайта на Vercel, например https://training-theta-eight.vercel.app
         sync: false
       # ALLOWED_ORIGINS — только если сайт открывают ещё с других адресов (через запятую).
       # Адрес из SITE_URL разрешён автоматически.
