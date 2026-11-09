@@ -80,10 +80,12 @@ python backend/app.py
    `postgresql://user:password@ep-....neon.tech/neondb?sslmode=require`. Таблицы сервер создаст сам.
 2. **Письма — Brevo.** В настройках создать API-ключ (SMTP & API → API Keys) и подтвердить
    адрес отправителя (Senders). Без подтверждённого отправителя Brevo письма не отправит.
-3. **Бэкенд — Render** → New → Web Service → репозиторий:
+3. **Бэкенд — Render.** Проще всего через Blueprint: New → Blueprint → этот репозиторий.
+   Render прочитает `render.yaml` (корень `backend`, сборка, запуск gunicorn, проверка `/api/health`)
+   и спросит значения переменных. Вручную (New → Web Service) настройки те же:
    - Root Directory: `backend`
    - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn app:app`
+   - Start Command: `gunicorn app:app --workers 2 --timeout 60`
    - Health Check Path: `/api/health`
    - Environment:
 
@@ -93,13 +95,30 @@ python backend/app.py
      | `BREVO_API_KEY` | ключ из Brevo |
      | `MAIL_FROM` | подтверждённый в Brevo адрес отправителя |
      | `API_URL` | адрес сервиса на Render, например `https://training-api.onrender.com` |
-     | `SITE_URL` | адрес сайта на Vercel, например `https://training.vercel.app` |
-     | `ALLOWED_ORIGINS` | адрес сайта на Vercel (несколько — через запятую) |
+     | `SITE_URL` | рабочий адрес сайта на Vercel (без `/` в конце); ему доступ к API открыт автоматически |
+     | `ALLOWED_ORIGINS` | необязательно: другие адреса сайта через запятую |
      | `DEBUG` | `0` |
+
+     Проверка: `https://<адрес-на-render>/api/health` должен ответить `{"ok":true}`.
 4. **Сайт — Vercel** → Add New → Project → тот же репозиторий: Framework Preset `Other`,
-   Build Command и Output Directory не заполнять. Папку `backend/` Vercel не выкладывает (`.vercelignore`).
+   Root Directory пустой (корень репозитория), Build Command и Output Directory не заполнять.
+   Папку `backend/` Vercel не выкладывает (`.vercelignore`). Для сайта нужен **один** проект Vercel.
 5. Вписать адрес Render в `PRODUCTION_API_URL` в `assets/auth.js`, закоммитить и запушить —
    Vercel и Render пересоберутся сами.
+
+### Если Vercel показывает «404 DEPLOYMENT_NOT_FOUND»
+
+Это значит, что у проекта, к которому привязан адрес, нет ни одного успешного деплоя
+(проект пустой, удалён, или каждая сборка падает). Код сайта тут ни при чём.
+
+1. В Vercel открой каждый проект, подключённый к репозиторию, и посмотри Settings → Domains:
+   там видно, какому проекту принадлежит адрес.
+2. Рабочий проект — тот, у которого последний деплой с ветки `main` зелёный (Deployments → Ready).
+   Его адрес и есть адрес сайта.
+3. Чтобы сайт открывался по старому адресу: удали адрес в пустом проекте (Settings → Domains → Remove)
+   и добавь его в рабочий (Add → `имя.vercel.app`).
+4. Лишние проекты удали (Settings → General → Delete Project): бэкенд живёт на Render,
+   отдельный проект Vercel для папки `backend/` не нужен, и его сборка будет падать на каждом коммите.
 
 Бесплатный Render засыпает без запросов, поэтому первый запрос после перерыва может идти около минуты.
 

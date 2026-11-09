@@ -19,6 +19,10 @@
   // аккаунты и ограничения выключены, и сайт работает как раньше.
   if (!API_URL) return;
 
+  // Бесплатный Render засыпает после 15 минут без запросов и просыпается до минуты.
+  // Будим сервер сразу при открытии страницы, чтобы ко входу он уже отвечал.
+  if (!isLocal) fetch(API_URL + '/api/health').catch(function () {});
+
   const GUEST_LIMIT = 5;                                  // сколько задач можно решить без входа
   const TOKEN_KEY = 'training-auth-token';                // токен сессии после входа
   const GUEST_GEN_KEY = 'training-guest-generated';       // задачи из генератора, решённые без входа
@@ -268,6 +272,8 @@
     submitBtn.disabled = true;
     showError('');
     $('authResend').hidden = true;
+    const SLOW_TEXT = 'Сервер просыпается после простоя, это может занять до минуты…';
+    const slow = setTimeout(function () { showNotice(SLOW_TEXT, 'info'); }, 4000);
     try {
       const res = await api(mode === 'login' ? '/api/login' : '/api/register', 'POST', { email: email, password: password });
       pending = { email: email, password: password };
@@ -284,6 +290,8 @@
     } catch (err) {
       showError(serverDownMessage());
     } finally {
+      clearTimeout(slow);
+      if ($('authNotice').textContent === SLOW_TEXT) showNotice('');
       submitBtn.disabled = false;
     }
   });

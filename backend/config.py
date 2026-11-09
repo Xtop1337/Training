@@ -54,10 +54,10 @@ PORT = int(os.environ.get("PORT", "5000"))
 DEBUG = os.environ.get("DEBUG", "1") == "1"
 
 # Адрес самого сервера: из него собирается ссылка в письме.
-API_URL = os.environ.get("API_URL", "http://127.0.0.1:5000")
+API_URL = os.environ.get("API_URL", "http://127.0.0.1:5000").strip().rstrip("/")
 
 # Адрес сайта: сюда пользователь попадает после подтверждения почты.
-SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")
+SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000").strip().rstrip("/")
 
 # Сайты, которым разрешено обращаться к API (CORS).
 # Без этого браузер не даст странице с другого адреса читать ответы сервера.
@@ -72,6 +72,12 @@ for origin in os.environ.get("ALLOWED_ORIGINS", "").split(","):
     origin = origin.strip().rstrip("/")
     if origin and origin not in ALLOWED_ORIGINS:
         ALLOWED_ORIGINS.append(origin)
+
+# Сайт из SITE_URL разрешается всегда, даже если его забыли вписать в ALLOWED_ORIGINS.
+# Origin — это только схема и домен: из https://site.vercel.app/Training берётся https://site.vercel.app
+_site_origin = "/".join(SITE_URL.split("/")[:3])
+if _site_origin.startswith("http") and _site_origin not in ALLOWED_ORIGINS:
+    ALLOWED_ORIGINS.append(_site_origin)
 
 # Сколько дней действует вход, прежде чем придётся войти снова
 SESSION_DAYS = 30

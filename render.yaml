@@ -1,0 +1,27 @@
+# Render Blueprint: бэкенд Training (Flask + gunicorn).
+# Render → New → Blueprint → этот репозиторий. Значения с sync: false Render спросит при создании.
+services:
+  - type: web
+    name: training-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # gunicorn сам слушает порт из переменной PORT, которую задаёт Render
+    startCommand: gunicorn app:app --workers 2 --timeout 60
+    healthCheckPath: /api/health
+    envVars:
+      - key: DEBUG
+        value: "0"
+      - key: DATABASE_URL      # строка подключения из Neon: postgresql://...neon.tech/neondb?sslmode=require
+        sync: false
+      - key: BREVO_API_KEY     # ключ API из Brevo
+        sync: false
+      - key: MAIL_FROM         # адрес отправителя, подтверждённый в Brevo
+        sync: false
+      - key: API_URL           # адрес этого сервиса, например https://training-api.onrender.com
+        sync: false
+      - key: SITE_URL          # адрес сайта на Vercel, например https://training-5bre.vercel.app
+        sync: false
+      # ALLOWED_ORIGINS — только если сайт открывают ещё с других адресов (через запятую).
+      # Адрес из SITE_URL разрешён автоматически.
