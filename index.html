@@ -25,8 +25,9 @@
     <a class="brand" href="#trainers" aria-label="Training, на главную"><span class="brand__mark">∫</span><span class="brand__name">Training</span></a>
     <nav class="seg-nav" aria-label="Разделы">
       <span class="seg-nav__drop" aria-hidden="true"></span>
-      <a href="#trainers" data-view="trainers" aria-current="page">Тренажёры</a>
-      <a href="#materials" data-view="materials">Материалы</a>
+      <a href="#trainers" data-view="trainers" aria-current="page"><span class="t-long">Тренажёры</span><span class="t-short">Темы</span></a>
+      <a href="#materials" data-view="materials"><span class="t-long">Материалы</span><span class="t-short">PDF</span></a>
+      <a href="#updates" data-view="updates"><span class="t-long">Обновления</span><span class="t-short">Новое</span></a>
       <a href="#about" data-view="about">О сайте</a>
     </nav>
     <button class="theme-btn" id="themeBtn" type="button" data-mode="system" aria-label="Тема: как в системе" title="Тема: как в системе">
@@ -250,6 +251,74 @@
             <div class="doc__actions"><a class="lq-btn lq-btn--sm" href="pdf/integrals-guide.pdf" target="_blank" rel="noopener">Открыть</a><a class="lq-btn lq-btn--sm" href="pdf/integrals-guide.pdf" download="Разбор — интегралы с нуля до экзамена.pdf">Скачать</a></div>
           </div>
         </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= Обновления ================= -->
+  <section class="view" data-view="updates" aria-label="Обновления" hidden>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Что изменилось</p>
+        <h2 class="h2">Обновления</h2>
+      </div>
+      <p class="lead">Новые возможности и исправления, свежие сверху. Если нашёл ошибку, напиши авторам на GitHub.</p>
+    </div>
+
+    <div class="releases">
+      <article class="release glass release--latest" data-sheen data-version="1.3">
+        <header class="release__head">
+          <span class="release__ver">v1.3</span>
+          <time class="release__date" datetime="2026-11-09">9 ноября 2026</time>
+          <span class="release__now">Сейчас</span>
+        </header>
+        <h3 class="release__title">Профиль и обновления</h3>
+        <ul class="release__list">
+            <li><span class="tag tag--new">Новое</span><span>Настройки профиля: можно поставить свою аватарку и сменить ник. Фото само обрезается до квадрата.</span></li>
+            <li><span class="tag tag--new">Новое</span><span>Вкладка «Обновления» — история изменений сайта. Точка на вкладке появляется, когда выходит что-то новое.</span></li>
+            <li><span class="tag tag--fix">Исправлено</span><span>Почта, пароль и ник принимаются только латиницей. Если включена русская раскладка, сайт подскажет переключить её на английскую.</span></li>
+            <li><span class="tag tag--fix">Исправлено</span><span>Аккаунты с почтой на кириллице удалены: войти в них всё равно было нельзя.</span></li>
+            <li><span class="tag tag--fix">Исправлено</span><span>Сервер больше не падает при запуске, если стартует сразу несколько его процессов.</span></li>
+        </ul>
+      </article>
+      <article class="release glass" data-sheen data-version="1.2">
+        <header class="release__head">
+          <span class="release__ver">v1.2</span>
+          <time class="release__date" datetime="2026-11-09">9 ноября 2026</time>
+          
+        </header>
+        <h3 class="release__title">Сайт в интернете</h3>
+        <ul class="release__list">
+            <li><span class="tag tag--new">Новое</span><span>Сайт работает на Vercel, аккаунты и прогресс хранит сервер на Render.</span></li>
+            <li><span class="tag tag--fix">Исправлено</span><span>На Vercel вместо сайта открывалась ошибка 404 — сайт теперь собирается как статический.</span></li>
+            <li><span class="tag tag--better">Улучшено</span><span>Регистрация сразу открывает аккаунт, подтверждать почту письмом не нужно.</span></li>
+            <li><span class="tag tag--better">Улучшено</span><span>Сервер просыпается, как только открываешь сайт. Если он отвечает долго, сайт пишет, что сервер просыпается.</span></li>
+        </ul>
+      </article>
+      <article class="release glass" data-sheen data-version="1.1">
+        <header class="release__head">
+          <span class="release__ver">v1.1</span>
+          <time class="release__date" datetime="2026-11-08">8 ноября 2026</time>
+          
+        </header>
+        <h3 class="release__title">Аккаунты</h3>
+        <ul class="release__list">
+            <li><span class="tag tag--new">Новое</span><span>Регистрация и вход по почте. Прогресс хранится в аккаунте и виден на любом устройстве.</span></li>
+            <li><span class="tag tag--new">Новое</span><span>Без входа можно решить 5 задач и пользоваться калькулятором. Шпаргалки и разборы открываются после входа.</span></li>
+        </ul>
+      </article>
+      <article class="release glass" data-sheen data-version="1.0">
+        <header class="release__head">
+          <span class="release__ver">v1.0</span>
+          <time class="release__date" datetime="2026-11-08">8 ноября 2026</time>
+          
+        </header>
+        <h3 class="release__title">Запуск</h3>
+        <ul class="release__list">
+            <li><span class="tag tag--new">Новое</span><span>Три тренажёра: пределы, производные и интегралы. 43 темы и 407 задач с проверкой ответа.</span></li>
+            <li><span class="tag tag--new">Новое</span><span>Калькуляторы с пошаговым решением, генератор задач трёх уровней и контрольная из 10 задач.</span></li>
+            <li><span class="tag tag--new">Новое</span><span>Шпаргалки и разборы в PDF, светлая и тёмная тема, оформление «жидкое стекло».</span></li>
+        </ul>
       </article>
     </div>
   </section>

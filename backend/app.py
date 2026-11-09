@@ -18,9 +18,12 @@
     POST /api/logout    — выход
     GET  /api/progress  — весь прогресс пользователя
     POST /api/progress  — сохранить прогресс: {"key": "limits-progress-v1", "data": {"0-1": true}}
-Для /api/me, /api/logout и /api/progress нужен заголовок Authorization: Bearer <токен>.
+    POST /api/profile   — настройки профиля: {"nickname": "...", "avatar": "data:image/webp;base64,..." или null}
+Для /api/me, /api/logout, /api/progress и /api/profile нужен заголовок Authorization: Bearer <токен>.
+Почта, пароль и ник принимаются только латиницей.
 """
 
+import base64
 import re
 import smtplib
 
@@ -125,8 +128,10 @@ def check_email(email):
     Возвращает текст ошибки или пустую строку, если всё хорошо.
     """
     error = ""
-    if len(email) > config.EMAIL_MAX_LENGTH or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
-        error = "Похоже, в адресе почты ошибка"
+    if not email.isascii():
+        error = "Почта пишется только латиницей, например name@gmail.com. Переключи раскладку на английскую."
+    elif len(email) > config.EMAIL_MAX_LENGTH or not re.fullmatch(config.EMAIL_PATTERN, email, re.ASCII):
+        error = "Похоже, в адресе почты ошибка. Пример: name@gmail.com"
 
     return error
 
@@ -137,7 +142,9 @@ def check_password(password):
     Возвращает текст ошибки или пустую строку, если пароль подходит.
     """
     error = ""
-    if len(password) < config.PASSWORD_MIN_LENGTH:
+    if password and not re.fullmatch(config.PASSWORD_PATTERN, password, re.ASCII):
+        error = "Пароль — только латинские буквы, цифры и знаки, без русских букв и пробелов"
+    elif len(password) < config.PASSWORD_MIN_LENGTH:
         error = f"Пароль должен быть не короче {config.PASSWORD_MIN_LENGTH} символов"
     elif len(password) > config.PASSWORD_MAX_LENGTH:
         error = f"Пароль должен быть не длиннее {config.PASSWORD_MAX_LENGTH} символов"
@@ -152,7 +159,9 @@ def make_user_info(user):
     """
     user_info = {
         "email": user["email"],
-        "name": user["email"].split("@")[0],
+        "name": user["nickname"] or user["email"].split("@")[0],
+        "nickname": user["nickname"] or "",
+        "avatar": user["avatar"] or "",
         "created_at": user["created_at"],
     }
 
@@ -175,6 +184,49 @@ def send_confirm_mail(user_id, email):
         database.mark_mail_sent(user_id)
 
     return sent
+
+
+def check_nickname(nickname):
+    """
+    Функция, которая проверяет ник. Возвращает текст ошибки или пустую строку.
+    """
+    error = ""
+    if not nickname.isascii():
+        error = "Ник пишется только латиницей. Переключи раскладку на английскую."
+    elif not re.fullmatch(config.NICKNAME_PATTERN, nickname, re.ASCII):
+        error = (f"Ник — от {config.NICKNAME_MIN_LENGTH} до {config.NICKNAME_MAX_LENGTH} символов: "
+                 "латинские буквы, цифры, точка, _ и -. Начинается с буквы или цифры.")
+
+    return error
+
+
+# Первые байты файлов-картинок, которые принимаем в аватарку
+IMAGE_SIGNATURES = {
+    "png": lambda raw: raw.startswith(b"\x89PNG\r\n\x1a\n"),
+    "jpeg": lambda raw: raw.startswith(b"\xff\xd8\xff"),
+    "webp": lambda raw: raw[:4] == b"RIFF" and raw[8:12] == b"WEBP",
+}
+
+
+def check_avatar(avatar):
+    """
+    Функция, которая проверяет аватарку: data:-ссылку на картинку PNG, JPEG или WebP.
+    Проверяет, что внутри действительно картинка этого типа и что она не слишком большая.
+    Возвращает текст ошибки или пустую строку.
+    """
+    match = re.fullmatch(r"data:image/(png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})", avatar)
+    if match is None:
+        return "Аватарка — картинка PNG, JPEG или WebP"
+    if len(match.group(2)) > config.AVATAR_MAX_BYTES * 4 // 3 + 4:
+        return "Картинка слишком большая"
+    try:
+        raw = base64.b64decode(match.group(2), validate=True)
+    except ValueError:
+        return "Картинка повреждена"
+    if not IMAGE_SIGNATURES[match.group(1)](raw):
+        return "Картинка повреждена"
+
+    return ""
 
 
 def clean_progress(data):
@@ -381,6 +433,9 @@ def login():
     """
     email, password = read_email_and_password()
 
+    if not (email + password).isascii():
+        return make_error("Почта и пароль пишутся только латиницей. Переключи раскладку на английскую.", 400)
+
     user = database.find_user_by_email(email)
     if user is None or not check_password_hash(user["password_hash"], password):
         return make_error("Неверная почта или пароль", 401)
@@ -415,6 +470,40 @@ def logout():
         database.delete_session(token)
 
     return jsonify({"ok": True})
+
+
+@app.post("/api/profile")
+def save_profile():
+    """
+    Функция, которая сохраняет настройки профиля: ник и аватарку.
+    Можно прислать что-то одно. Пустой ник — показывать начало почты,
+    пустая аватарка (null или "") — показывать первую букву имени.
+    """
+    user = get_current_user()
+    if user is None:
+        return make_error("Нужно войти в аккаунт", 401)
+
+    data = read_json()
+    nickname = None
+    avatar = None
+    if "nickname" in data:
+        nickname = str(data.get("nickname") or "").strip()
+        error = check_nickname(nickname) if nickname else ""
+        if error:
+            return make_error(error, 400, "bad_nickname")
+    if "avatar" in data:
+        avatar = str(data.get("avatar") or "")
+        error = check_avatar(avatar) if avatar else ""
+        if error:
+            return make_error(error, 400, "bad_avatar")
+
+    if "nickname" in data:
+        database.set_nickname(user["id"], nickname or None)
+    if "avatar" in data:
+        database.set_avatar(user["id"], avatar or None)
+    user = database.find_user_by_id(user["id"])
+
+    return jsonify({"user": make_user_info(user), "message": "Профиль сохранён"})
 
 
 @app.get("/api/progress")
@@ -457,6 +546,9 @@ def prepare_database():
     """
     database.create_tables()
     database.delete_expired_rows()
+    removed = database.delete_invalid_users()
+    if removed:
+        print("Удалены аккаунты с почтой не латиницей:", removed)
     if database.USE_POSTGRES:
         print("База данных: Postgres (DATABASE_URL)")
     else:

@@ -82,6 +82,21 @@ dialog.auth::backdrop{background:rgba(8,12,27,.32);-webkit-backdrop-filter:blur(
 .auth__name{font:600 21px/1.15 var(--f-display);word-break:break-word}
 .auth__sub{margin-top:2px!important;color:var(--muted);font-size:14.5px;word-break:break-all}
 
+/* ---------- аватарка-фото ---------- */
+.account-btn__ava,.auth__ava{overflow:hidden}
+.account-btn__ava img,.auth__ava img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ---------- настройки профиля ---------- */
+.profile{display:grid;gap:12px;padding-top:16px;border-top:1px solid var(--edge)}
+.profile__title{margin:0;font:600 16px/1.3 var(--f-body)}
+.profile__ava{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap}
+.profile__label{font-size:13.5px;font-weight:500;color:var(--muted)}
+.profile__ava-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.profile__upload{position:relative;overflow:hidden;cursor:pointer}
+.profile__upload input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
+.profile__upload:focus-within{outline:2px solid var(--accent);outline-offset:3px}
+.auth__profile > .lq-btn{justify-self:start}
+
 /* ---------- без входа: плашка с лимитом задач в тренажёре ---------- */
 .guest-note{display:grid;gap:10px;margin:14px 0 4px;padding:14px;border-radius:var(--r-lg);font-size:14px;line-height:1.4;
   background:var(--fill);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim-soft)}
@@ -117,6 +132,11 @@ dialog.auth::backdrop{background:rgba(8,12,27,.32);-webkit-backdrop-filter:blur(
 .doclinks .lock-veil:hover .lock-veil__text,.doclinks .lock-veil:focus-visible .lock-veil__text{transform:translate(0,-50%)}
 @media (hover:none){.doclinks .lock-veil__text{transform:translate(0,-50%)}}
 
+/* до ширины ноутбука кнопка аккаунта — только значок или аватарка, чтобы хватило места вкладкам */
+@media (max-width:1024px){
+  .account-btn,.account-btn[data-state="in"]{width:44px;padding:0;justify-content:center}
+  .account-btn__text{display:none}
+}
 @media (max-width:640px){
   .account-btn,.account-btn[data-state="in"]{width:40px;height:40px;padding:0;justify-content:center}
   .account-btn__text{display:none}
@@ -131,4 +151,9 @@ dialog.auth::backdrop{background:rgba(8,12,27,.32);-webkit-backdrop-filter:blur(
   .account-btn,.account-btn[data-state="in"]{width:36px;height:36px}
   .account-btn__icon{width:18px;height:18px}
   .account-btn__ava{width:26px;height:26px;font-size:13px}
+}
+@media (max-width:340px){
+  .sitebar__in:has(.account-btn:not([hidden])) .seg-nav a{padding:8px 5px;font-size:12.5px}
+  .sitebar__in:has(.account-btn:not([hidden])) .theme-btn,
+  .account-btn,.account-btn[data-state="in"]{width:34px;height:34px}
 }

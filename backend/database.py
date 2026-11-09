@@ -13,6 +13,7 @@
 
 import hashlib
 import json
+import re
 import secrets
 import sqlite3
 from datetime import datetime, timedelta, timezone
@@ -99,11 +100,36 @@ def remove_old_tables(connection):
         run(connection, "DROP TABLE IF EXISTS sessions")
 
 
+def add_missing_columns(connection):
+    """
+    Функция, которая добавляет в таблицу users столбцы, появившиеся позже:
+    nickname (ник) и avatar (аватарка). Базы, созданные раньше, получают их при запуске сервера.
+    """
+    if USE_POSTGRES:
+        run(connection, "ALTER TABLE users ADD COLUMN IF NOT EXISTS nickname TEXT")
+        run(connection, "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar TEXT")
+        return
+
+    columns = [row["name"] for row in connection.execute("PRAGMA table_info(users)")]
+    for column in ("nickname", "avatar"):
+        if column not in columns:
+            try:
+                run(connection, f"ALTER TABLE users ADD COLUMN {column} TEXT")
+            except sqlite3.OperationalError as error:
+                # столбец успел добавить другой процесс сервера — это не ошибка
+                if "duplicate column" not in str(error):
+                    raise
+
+
 def create_tables():
     """
     Функция, которая создаёт все таблицы, если их ещё нет в базе.
     """
     connection = get_connection()
+    if USE_POSTGRES:
+        # Если несколько процессов сервера стартуют одновременно, таблицы создаёт один,
+        # остальные ждут: замок держится до конца транзакции (до commit)
+        run(connection, "SELECT pg_advisory_xact_lock(271828)")
     remove_old_tables(connection)
     run(
         connection,
@@ -114,10 +140,13 @@ def create_tables():
             password_hash TEXT NOT NULL,
             is_confirmed INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL,
-            mail_sent_at TEXT
+            mail_sent_at TEXT,
+            nickname TEXT,
+            avatar TEXT
         )
         """
     )
+    add_missing_columns(connection)
     run(
         connection,
         """
@@ -233,6 +262,46 @@ def confirm_user(user_id):
     run(connection, "UPDATE users SET is_confirmed = 1 WHERE id = ?", (user_id,))
     connection.commit()
     connection.close()
+
+
+def set_nickname(user_id, nickname):
+    """
+    Функция, которая меняет ник. None — убрать ник (тогда показывается начало почты).
+    """
+    connection = get_connection()
+    run(connection, "UPDATE users SET nickname = ? WHERE id = ?", (nickname, user_id))
+    connection.commit()
+    connection.close()
+
+
+def set_avatar(user_id, avatar):
+    """
+    Функция, которая меняет аватарку (data:-ссылка на картинку). None — убрать аватарку.
+    """
+    connection = get_connection()
+    run(connection, "UPDATE users SET avatar = ? WHERE id = ?", (avatar, user_id))
+    connection.commit()
+    connection.close()
+
+
+def delete_invalid_users():
+    """
+    Функция, которая удаляет аккаунты с почтой не латиницей (например «почта@сайт.рф»).
+    Такие аккаунты успели создать до того, как сервер начал проверять почту.
+    Вместе с аккаунтом удаляются его сессии, ссылки из писем и прогресс.
+    Возвращает, сколько аккаунтов удалено.
+    """
+    connection = get_connection()
+    rows = run(connection, "SELECT id, email FROM users").fetchall()
+    bad_ids = [row["id"] for row in rows if not re.fullmatch(config.EMAIL_PATTERN, row["email"], re.ASCII)]
+    for user_id in bad_ids:
+        for table in ("sessions", "email_codes", "password_codes", "progress"):
+            run(connection, f"DELETE FROM {table} WHERE user_id = ?", (user_id,))
+        run(connection, "DELETE FROM users WHERE id = ?", (user_id,))
+    connection.commit()
+    connection.close()
+
+    return len(bad_ids)
 
 
 # ---------- подтверждение почты ----------

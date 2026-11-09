@@ -150,6 +150,11 @@ a{color:var(--accent)}
 .seg-nav a:hover{color:var(--ink)}
 .seg-nav a[aria-current="page"]{color:var(--ink)}
 .seg-nav a .g{font:italic 17px/1 var(--f-math);opacity:.75}
+.seg-nav .t-short{display:none}
+/* точка «есть новое» на вкладке */
+.seg-nav a.has-new::after{content:"";position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;
+  background:var(--coral);box-shadow:0 0 0 2px var(--glass-hi);animation:new-pulse 2.4s ease-in-out infinite}
+@keyframes new-pulse{50%{transform:scale(1.35)}}
 .seg-nav__drop{position:absolute;z-index:0;top:4px;bottom:4px;left:0;width:0;border-radius:999px;
   background:linear-gradient(180deg,var(--glass-hi),var(--fill-hover));
   box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim-soft),0 6px 16px -6px var(--shade);
@@ -192,8 +197,26 @@ a{color:var(--accent)}
 @media (max-width:480px){
   .sitebar--home .brand{display:none}
 }
+/* на планшете и телефоне у главной четыре вкладки: короткие подписи и без названия рядом с логотипом */
+@media (max-width:860px){
+  .seg-nav .t-long{display:none}
+  .seg-nav .t-short{display:inline}
+  .brand__name{display:none}
+  /* в тренажёрах: у неактивных вкладок остаётся только математический значок */
+  .seg-nav--topics a{gap:6px}
+  .seg-nav--topics a:not([aria-current="page"]) .t{display:none}
+  .seg-nav--topics a:not([aria-current="page"]) .g{opacity:.9;font-size:18px;padding:0 4px}
+}
+@media (max-width:400px){
+  /* совсем узкий экран: в тренажёрах только значки, название темы и так в заголовке страницы */
+  .seg-nav--topics a .t{display:none}
+  .seg-nav--topics a .g{opacity:.9;font-size:18px;padding:0 4px}
+}
 @media (max-width:370px){
   .seg-nav a{padding:8px 8px;font-size:13px}
+}
+@media (max-width:340px){
+  .sitebar__in .seg-nav a{padding:8px 5px;font-size:12.5px}
 }
 @media (prefers-reduced-motion:reduce){
   .liquid i{animation:none!important}

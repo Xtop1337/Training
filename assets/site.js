@@ -104,9 +104,22 @@
       views.forEach(function(v){v.hidden=v.dataset.view!==view});
       links.forEach(function(a){if(a.dataset.view===view)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
       placeDrop(null,animate);
-      var title={trainers:'Training',materials:'Материалы · Training',about:'О сайте · Training'}[view];
+      var title={trainers:'Training',materials:'Материалы · Training',updates:'Обновления · Training',about:'О сайте · Training'}[view];
       if(title)document.title=title;
+      if(view==='updates')markUpdatesSeen();
     }
+    // точка на вкладке «Обновления», пока последнюю версию не посмотрели
+    var latest=document.querySelector('.release[data-version]');
+    var latestVersion=latest?latest.dataset.version:'';
+    var updatesLink=document.querySelector('.seg-nav a[data-view="updates"]');
+    var SEEN_KEY='training-seen-version';
+    function markUpdatesSeen(){if(!latestVersion)return;store.set(SEEN_KEY,latestVersion);if(updatesLink)updatesLink.classList.remove('has-new')}
+    if(latestVersion&&updatesLink){
+      var seen=store.get(SEEN_KEY);
+      if(seen===null)store.set(SEEN_KEY,latestVersion);           // первый визит: всё и так новое, точку не показываем
+      else if(seen!==latestVersion)updatesLink.classList.add('has-new');
+    }
+
     show(false);
     window.addEventListener('hashchange',function(){show(true);window.scrollTo({top:0,behavior:'auto'})});
 

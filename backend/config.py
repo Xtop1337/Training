@@ -105,10 +105,26 @@ RESET_LINK_HOURS = 1
 # Не чаще одного письма в столько секунд (защита от спама)
 RESEND_PAUSE_SECONDS = 60
 
-# Ограничения на почту и пароль
+# Ограничения на почту и пароль. Всё пишется только латиницей:
+# почта — латинские буквы, цифры и . _ % + - (домен тоже латиницей, например gmail.com);
+# пароль — латинские буквы, цифры и знаки ASCII без пробелов.
 EMAIL_MAX_LENGTH = 254
+EMAIL_PATTERN = (
+    r"[A-Za-z0-9._%+-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?"
+    r"(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}"
+)
 PASSWORD_MIN_LENGTH = 6
 PASSWORD_MAX_LENGTH = 100
+PASSWORD_PATTERN = r"[\x21-\x7E]+"
+
+# Ник: 3–20 символов, латинские буквы, цифры, точка, _ и -; начинается с буквы или цифры
+NICKNAME_MIN_LENGTH = 3
+NICKNAME_MAX_LENGTH = 20
+NICKNAME_PATTERN = r"[A-Za-z0-9][A-Za-z0-9_.-]{2,19}"
+
+# Аватарка: картинка PNG, JPEG или WebP в виде data:-ссылки. Сайт сам уменьшает фото
+# до 160×160, так что получается 5–20 КБ; больше этого предела сервер не примет.
+AVATAR_MAX_BYTES = 80_000
 
 # Ключи прогресса тренажёров — те же, что в localStorage на сайте
 PROGRESS_KEYS = ["limits-progress-v1", "deriv-progress-v1", "integrals-progress-v1"]

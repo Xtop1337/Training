@@ -35,6 +35,20 @@
     })
     .catch(function () {});
 
+  // Почта, пароль и ник — только латиницей (те же правила проверяет сервер, backend/config.py)
+  const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/;
+  const NICKNAME_RE = /^[A-Za-z0-9][A-Za-z0-9_.-]{2,19}$/;
+  const NOT_LATIN = {
+    email: /[^A-Za-z0-9._%+@-]/g,
+    password: /[^\x21-\x7E]/g,   // латинские буквы, цифры и знаки ASCII, без пробелов
+    nickname: /[^A-Za-z0-9_.-]/g
+  };
+  const LATIN_MESSAGE = {
+    email: 'Почта пишется латиницей, например name@gmail.com. Переключи раскладку на английскую (EN).',
+    password: 'В пароле — только латинские буквы, цифры и знаки, без пробелов. Переключи раскладку на английскую (EN).',
+    nickname: 'В нике — только латинские буквы, цифры, точка, _ и -. Переключи раскладку на английскую (EN).'
+  };
+
   const GUEST_LIMIT = 5;                                  // сколько задач можно решить без входа
   const TOKEN_KEY = 'training-auth-token';                // токен сессии после входа
   const GUEST_GEN_KEY = 'training-guest-generated';       // задачи из генератора, решённые без входа
@@ -116,9 +130,9 @@
         <button type="button" data-mode="login" aria-pressed="true">Вход</button>
         <button type="button" data-mode="register" aria-pressed="false">Регистрация</button>
       </div>
-      <label class="field"><span>Почта</span><input name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" maxlength="254" required></label>
+      <label class="field"><span>Почта</span><input name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" maxlength="254" placeholder="name@gmail.com" required></label>
       <label class="field"><span>Пароль</span><input name="password" type="password" autocomplete="current-password" maxlength="100" required></label>
-      <p class="auth__hint" id="authHint" hidden>Пароль — не короче 6 символов. После регистрации придёт письмо со ссылкой: без подтверждения почты войти нельзя.</p>
+      <p class="auth__hint" id="authHint" hidden>Почта и пароль — только латиницей. Пароль — не короче 6 символов. После регистрации придёт письмо со ссылкой: без подтверждения почты войти нельзя.</p>
       <p class="auth__error" id="authError" role="alert" hidden></p>
       <button class="lq-btn lq-btn--primary auth__submit" id="authSubmit" type="submit">Войти</button>
       <button class="auth__link" id="authResend" type="button" hidden>Отправить письмо ещё раз</button>
@@ -127,14 +141,14 @@
 
     <form class="auth__form" id="forgotForm" novalidate hidden>
       <p class="auth__note">Введи почту, с которой регистрировался. Пришлём ссылку, по которой можно придумать новый пароль.</p>
-      <label class="field"><span>Почта</span><input name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" maxlength="254" required></label>
+      <label class="field"><span>Почта</span><input name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" maxlength="254" placeholder="name@gmail.com" required></label>
       <p class="auth__error" id="forgotError" role="alert" hidden></p>
       <button class="lq-btn lq-btn--primary auth__submit" id="forgotSubmit" type="submit">Отправить ссылку</button>
       <button class="auth__link" data-back-to-login type="button">Вспомнил пароль — войти</button>
     </form>
 
     <form class="auth__form" id="resetForm" novalidate hidden>
-      <p class="auth__note">Придумай новый пароль — не короче 6 символов. После смены ты сразу войдёшь, а на других устройствах аккаунт выйдет.</p>
+      <p class="auth__note">Придумай новый пароль латиницей — не короче 6 символов. После смены ты сразу войдёшь, а на других устройствах аккаунт выйдет.</p>
       <label class="field"><span>Новый пароль</span><input name="password" type="password" autocomplete="new-password" maxlength="100" required></label>
       <label class="field"><span>Повтори пароль</span><input name="repeat" type="password" autocomplete="new-password" maxlength="100" required></label>
       <p class="auth__error" id="resetError" role="alert" hidden></p>
@@ -161,6 +175,22 @@
         </div>
       </div>
       <p class="auth__note" id="authStats"></p>
+
+      <form class="profile" id="profileForm" novalidate>
+        <h3 class="profile__title">Настройки профиля</h3>
+        <div class="profile__ava">
+          <span class="profile__label">Аватарка</span>
+          <div class="profile__ava-actions">
+            <label class="lq-btn lq-btn--sm profile__upload">Загрузить фото<input id="avatarFile" type="file" accept="image/*"></label>
+            <button class="auth__link" id="avatarRemove" type="button" hidden>Убрать фото</button>
+          </div>
+        </div>
+        <label class="field"><span>Ник</span><input name="nickname" id="nicknameInput" type="text" autocomplete="nickname" autocapitalize="off" spellcheck="false" maxlength="20"></label>
+        <p class="auth__hint">3–20 символов латиницей: буквы, цифры, точка, _ и -. Если оставить пустым, вместо ника показывается начало почты.</p>
+        <p class="auth__error" id="profileError" role="alert" hidden></p>
+        <button class="lq-btn lq-btn--primary auth__submit" id="profileSave" type="submit">Сохранить</button>
+      </form>
+
       <button class="lq-btn" id="logoutBtn" type="button">Выйти</button>
     </div>
   </div>`;
@@ -174,6 +204,19 @@
   const submitBtn = $('authSubmit');
 
   /* ================= кнопка в панели ================= */
+  // Аватарка: фото, если оно есть, иначе первая буква имени
+  function paintAvatar(el, who) {
+    el.textContent = '';
+    if (who && who.avatar) {
+      const img = document.createElement('img');
+      img.src = who.avatar;
+      img.alt = '';
+      el.appendChild(img);
+    } else {
+      el.textContent = ((who && who.name) || '?').charAt(0).toUpperCase();
+    }
+  }
+
   function paintButton() {
     const text = accountBtn.querySelector('.account-btn__text');
     const ava = accountBtn.querySelector('.account-btn__ava');
@@ -181,7 +224,7 @@
     if (user) {
       accountBtn.dataset.state = 'in';
       text.textContent = user.name;
-      ava.textContent = user.name.charAt(0).toUpperCase();
+      paintAvatar(ava, user);
       label = 'Аккаунт: ' + user.email;
     } else {
       accountBtn.dataset.state = 'out';
@@ -218,7 +261,7 @@
 
   // Почта на сервере не настроена: меняем подсказку и прячем «Забыл пароль?»
   function applyMailMode() {
-    $('authHint').textContent = 'Пароль — не короче 6 символов. Подтверждать почту не нужно: после регистрации ты сразу войдёшь. Запомни пароль — восстановить его по почте пока нельзя.';
+    $('authHint').textContent = 'Почта и пароль — только латиницей. Пароль — не короче 6 символов. Подтверждать почту не нужно: после регистрации ты сразу войдёшь. Запомни пароль — восстановить его по почте пока нельзя.';
     $('authForgotLink').hidden = true;
   }
 
@@ -254,7 +297,8 @@
       $('authTitle').textContent = 'Аккаунт';
       $('authName').textContent = user.name;
       $('authEmail').textContent = user.email;
-      $('authAvatar').textContent = user.name.charAt(0).toUpperCase();
+      paintAvatar($('authAvatar'), user);
+      resetProfileForm();
       const since = formatDate(user.created_at);
       $('authStats').textContent = 'Решено задач: ' + totalSolved() + '. Прогресс хранится в аккаунте.' +
         (since ? ' Аккаунт создан ' + since : '');
@@ -284,6 +328,14 @@
     const password = passwordInput.value;
     if (!email || !password) {
       showError('Введи почту и пароль');
+      return;
+    }
+    if (mode === 'register' && !EMAIL_RE.test(email)) {
+      showError('Похоже, в адресе почты ошибка. Пример: name@gmail.com');
+      return;
+    }
+    if (mode === 'register' && password.length < 6) {
+      showError('Пароль должен быть не короче 6 символов');
       return;
     }
 
@@ -462,6 +514,153 @@
     applyProgressToPage();
     paintAll();
     dialog.close();
+  });
+
+  /* ================= только латиница в полях ================= */
+  // Русские буквы, пробелы и прочие лишние символы сразу убираются из поля,
+  // а под полем появляется подсказка переключить раскладку.
+  function keepLatin(input, kind, report) {
+    input.setAttribute('lang', 'en');
+    input.addEventListener('input', function () {
+      const value = input.value;
+      const clean = value.replace(NOT_LATIN[kind], '');
+      if (clean === value) return;
+      const pos = input.selectionStart; // у поля type="email" позиции курсора нет (null)
+      input.value = clean;
+      if (typeof pos === 'number') {
+        const caret = value.slice(0, pos).replace(NOT_LATIN[kind], '').length;
+        try { input.setSelectionRange(caret, caret); } catch (e) {}
+      }
+      report(LATIN_MESSAGE[kind]);
+    });
+  }
+  keepLatin(emailInput, 'email', showError);
+  keepLatin(passwordInput, 'password', showError);
+  keepLatin(forgotForm.elements.email, 'email', function (m) { showFormError('forgotError', m); });
+  keepLatin(resetForm.elements.password, 'password', function (m) { showFormError('resetError', m); });
+  keepLatin(resetForm.elements.repeat, 'password', function (m) { showFormError('resetError', m); });
+
+  /* ================= настройки профиля: ник и аватарка ================= */
+  const profileForm = $('profileForm');
+  const nicknameInput = $('nicknameInput');
+  const avatarFile = $('avatarFile');
+  const AVATAR_SIZE = 160; // сторона квадратной аватарки в пикселях
+  let stagedAvatar;        // undefined — не меняли; '' — убрать фото; 'data:…' — новое фото
+
+  keepLatin(nicknameInput, 'nickname', function (m) { showFormError('profileError', m); });
+
+  function emailName() { return user ? user.email.split('@')[0] : ''; }
+
+  // Показать в окне профиль как есть на сервере (несохранённые правки сбрасываются)
+  function resetProfileForm() {
+    stagedAvatar = undefined;
+    profileForm.reset();
+    nicknameInput.value = user.nickname || '';
+    nicknameInput.placeholder = emailName();
+    $('avatarRemove').hidden = !user.avatar;
+    showFormError('profileError', '');
+  }
+
+  // Что получится после сохранения — для предпросмотра в шапке окна
+  function previewUser() {
+    const name = nicknameInput.value.trim() || emailName();
+    const avatar = stagedAvatar === undefined ? user.avatar : stagedAvatar;
+    return { name: name, avatar: avatar };
+  }
+  function paintPreview() {
+    const who = previewUser();
+    $('authName').textContent = who.name;
+    paintAvatar($('authAvatar'), who);
+  }
+  nicknameInput.addEventListener('input', paintPreview);
+
+  // Фото обрезается по центру до квадрата и уменьшается до 160×160 прямо в браузере,
+  // поэтому на сервер уходит картинка в 5–20 КБ, какой бы большой ни была исходная
+  function readAvatar(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file.type || file.type.indexOf('image/') !== 0) {
+        reject(new Error('Нужна картинка: JPG, PNG или WebP'));
+        return;
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        reject(new Error('Файл больше 15 МБ — выбери картинку поменьше'));
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = function () {
+        const side = Math.min(img.naturalWidth, img.naturalHeight);
+        const canvas = document.createElement('canvas');
+        canvas.width = AVATAR_SIZE;
+        canvas.height = AVATAR_SIZE;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff'; // прозрачный фон PNG становится белым
+        ctx.fillRect(0, 0, AVATAR_SIZE, AVATAR_SIZE);
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side,
+          0, 0, AVATAR_SIZE, AVATAR_SIZE);
+        URL.revokeObjectURL(url);
+        let data = canvas.toDataURL('image/webp', 0.86);
+        if (data.indexOf('data:image/webp') !== 0) data = canvas.toDataURL('image/jpeg', 0.86); // старый Safari
+        resolve(data);
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error('Не получилось открыть картинку. Попробуй JPG или PNG.'));
+      };
+      img.src = url;
+    });
+  }
+
+  avatarFile.addEventListener('change', async function () {
+    const file = avatarFile.files && avatarFile.files[0];
+    avatarFile.value = ''; // чтобы тот же файл можно было выбрать ещё раз
+    if (!file) return;
+    showFormError('profileError', '');
+    try {
+      stagedAvatar = await readAvatar(file);
+      $('avatarRemove').hidden = false;
+      paintPreview();
+      showNotice('Фото выбрано. Нажми «Сохранить», чтобы поставить его.', 'info');
+    } catch (err) {
+      showFormError('profileError', err.message);
+    }
+  });
+
+  $('avatarRemove').addEventListener('click', function () {
+    stagedAvatar = '';
+    $('avatarRemove').hidden = true;
+    paintPreview();
+  });
+
+  profileForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const nickname = nicknameInput.value.trim();
+    if (nickname && !NICKNAME_RE.test(nickname)) {
+      showFormError('profileError', 'Ник — от 3 до 20 символов: латинские буквы, цифры, точка, _ и -. Начинается с буквы или цифры.');
+      return;
+    }
+    const body = { nickname: nickname };
+    if (stagedAvatar !== undefined) body.avatar = stagedAvatar || null;
+
+    $('profileSave').disabled = true;
+    showFormError('profileError', '');
+    try {
+      const res = await api('/api/profile', 'POST', body);
+      if (res.ok) {
+        user = res.data.user;
+        paintAll();
+        openDialog(null, 'Профиль сохранён', 'ok');
+      } else if (res.status === 401) {
+        showFormError('profileError', 'Вход устарел. Выйди и войди снова.');
+      } else {
+        showFormError('profileError', res.data.error || 'Не получилось сохранить, попробуй ещё раз');
+      }
+    } catch (err) {
+      showFormError('profileError', serverDownMessage());
+    } finally {
+      $('profileSave').disabled = false;
+    }
   });
 
   /* ================= прогресс в аккаунте ================= */
