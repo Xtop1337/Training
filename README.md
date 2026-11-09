@@ -32,6 +32,7 @@ backend/config.py   настройки из переменных окружен�
 backend/.env.example образец файла backend/.env с паролем от почты (сам .env в git не попадает)
 backend/requirements.txt  зависимости Python (Flask, gunicorn для хостинга, psycopg для Postgres)
 .vercelignore       что не выкладывать на Vercel (папку backend/)
+vercel.json         сайт на Vercel собирается как статический, без пресета Flask
 ```
 
 Вставки сайта в файлы тренажёров помечены комментариями `<!-- Training: … -->` и `/* Training: … */`. Логика задач не менялась: тренажёр только сообщает `assets/auth.js` о сохранении прогресса (`window.TrainerBridge`).
@@ -100,13 +101,18 @@ python backend/app.py
      | `DEBUG` | `0` |
 
      Проверка: `https://<адрес-на-render>/api/health` должен ответить `{"ok":true}`.
-4. **Сайт — Vercel** → Add New → Project → тот же репозиторий: Framework Preset `Other`,
-   Root Directory пустой (корень репозитория), Build Command и Output Directory не заполнять.
-   Папку `backend/` Vercel не выкладывает (`.vercelignore`). Для сайта нужен **один** проект Vercel.
+4. **Сайт — Vercel** → Add New → Project → тот же репозиторий, Root Directory `./`.
+   При импорте Vercel видит Flask в `backend/` и предлагает пресет Flask. Это не страшно:
+   `vercel.json` (`"framework": null`) всё равно собирает сайт как статический (Other).
+   Build Command и Output Directory не заполнять. Папку `backend/` Vercel не выкладывает (`.vercelignore`).
+   Для сайта нужен **один** проект Vercel.
 5. Вписать адрес Render в `PRODUCTION_API_URL` в `assets/auth.js`, закоммитить и запушить —
    Vercel и Render пересоберутся сами.
 
 ### Если Vercel показывает «404 DEPLOYMENT_NOT_FOUND»
+
+Сборка с ошибкой `FLASK_ENTRYPOINT_NOT_FOUND` означает, что проект собирается с пресетом Flask.
+Нужен `vercel.json` из репозитория (он ставит пресет Other) — сделай Redeploy последнего коммита.
 
 Это значит, что у проекта, к которому привязан адрес, нет ни одного успешного деплоя
 (проект пустой, удалён, или каждая сборка падает). Код сайта тут ни при чём.
